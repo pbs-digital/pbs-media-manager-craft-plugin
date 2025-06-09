@@ -1,7 +1,7 @@
 {
   "name": "moon/pbs-media-manager-craft-plugin",
-  "description": "Media Manager 3 for PBS API",
-  "version": "3.2.0",
+  "description": "Media Manager 4 for PBS API",
+  "version": "4.0.6",
   "type": "craft-plugin",
   "keywords": ["craftcms", "pbs", "media-manager"],
   "license": "MIT",
@@ -9,18 +9,22 @@
     {
       "name": "Paper Tiger",
       "homepage": "https://papertiger.com"
+    },
+    {
+      "name": "Good Work",
+      "homepage": "https://simplygoodwork.com"
     }
   ],
   "support": {
-    "email": "info@papertiger.com",
-    "issues": "https://projects.pbs.org/bitbucket/projects/MOON/repos/pbs-media-manager-craft-plugin/issues",
-    "source": "https://projects.pbs.org/bitbucket/projects/MOON/repos/pbs-media-manager-craft-plugin/browse",
-    "docs": "https://projects.pbs.org/bitbucket/projects/MOON/repos/pbs-media-manager-craft-plugin/browse/README.md"
+    "email": "dev@simplygoodwork.com",
+    "issues": "https://github.com/pbs-digital/pbs-media-manager-craft-plugin/issues",
+    "source": "https://github.com/pbs-digital/pbs-media-manager-craft-plugin/blob/main/README.md",
+    "docs": "https://github.com/pbs-digital/pbs-media-manager-craft-plugin/blob/main/README.md"
   },
   "require": {
-    "craftcms/cms": ">=3.1.0",
-    "craftcms/redactor": ">=2.3.0",
-    "peppeocchi/php-cron-scheduler": "4.*"
+    "craftcms/cms": "^4.0.0",
+    "craftcms/redactor": "^3.0.0",
+    "craftcms/ckeditor": "^3.0.0"
   },
   "autoload": {
     "psr-4": {
@@ -30,7 +34,18 @@
   "extra": {
     "handle": "mediamanager",
     "name": "Media Manager",
-    "documentationUrl": "https://projects.pbs.org/bitbucket/projects/MOON/repos/pbs-media-manager-craft-plugin/browse/README.md",
+    "documentationUrl": "https://github.com/pbs/pbs-media-manager-craft-plugin/blob/main/README.md",
     "class": "papertiger\\mediamanager\\MediaManager"
+  },
+  "config": {
+    "allow-plugins": {
+      "craftcms/plugin-installer": true,
+      "yiisoft/yii2-composer": true
+    }
+  },
+  "minimum-stability": "dev",
+  "prefer-stable": true,
+  "require-dev": {
+    "craftcms/rector": "dev-main"
   }
 }

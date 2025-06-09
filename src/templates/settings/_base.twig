@@ -69,14 +69,84 @@
 
     <hr/>
 
+
     {{ forms.selectField({
         required: true,
         name: 'showSection',
         label: 'Show Section',
-        instructions: showSectionInfo,
+        instructions: 'Section to be used for Show entries.' ~ ( settings.showSection ? '' : ' <a target="_blank" href="'~ url('settings/sections/new' ) ~'">Create a blank section here.</a>' ),
         fieldClass: 'flex-grow',
         value: settings.showSection,
         options: sections,
         errors: settings.getErrors( 'showSection' )
     }) }}
+
+    <hr/>
+
+    {{ forms.selectField({
+        required: true,
+        name: 'blogTagsSection',
+        label: 'Blog Tag Section',
+        instructions: 'Section to be used for Blog Tag entries.' ~ ( settings.blogTagsSection ? '' : ' <a target="_blank" href="'~ url('settings/sections/new' ) ~'">Create a blank section here.</a>' ),
+        fieldClass: 'flex-grow',
+        value: settings.blogTagsSection,
+        options: sections,
+        errors: settings.getErrors( 'blogTagsSection' )
+    }) }}
+
+    {{ forms.selectField({
+        required: true,
+        name: 'dateTagsSection',
+        label: 'Date Tag Section',
+        instructions: 'Section to be used for Date Tag entries.' ~ ( settings.dateTagsSection ? '' : ' <a target="_blank" href="'~ url('settings/sections/new' ) ~'">Create a blank section here.</a>' ),
+        fieldClass: 'flex-grow',
+        value: settings.dateTagsSection,
+        options: sections,
+        errors: settings.getErrors( 'dateTagsSection' )
+    }) }}
+
+    {{ forms.selectField({
+        required: true,
+        name: 'filmTagsSection',
+        label: 'Film Tag Section',
+        instructions: 'Section to be used for Film Tag entries.' ~ ( settings.filmTagsSection ? '' : ' <a target="_blank" href="'~ url('settings/sections/new' ) ~'">Create a blank section here.</a>' ),
+        fieldClass: 'flex-grow',
+        value: settings.filmTagsSection,
+        options: sections,
+        errors: settings.getErrors( 'filmTagsSection' )
+    }) }}
+
+    {{ forms.selectField({
+        required: true,
+        name: 'siteTagsSection',
+        label: 'Site Tag Section',
+        instructions: 'Section to be used for Site Tag entries.' ~ ( settings.siteTagsSection ? '' : ' <a target="_blank" href="'~ url('settings/sections/new' ) ~'">Create a blank section here.</a>' ),
+        fieldClass: 'flex-grow',
+        value: settings.siteTagsSection,
+        options: sections,
+        errors: settings.getErrors( 'siteTagsSection' )
+    }) }}
+
+    {{ forms.selectField({
+        required: true,
+        name: 'themeTagsSection',
+        label: 'Theme Tag Section',
+        instructions: 'Section to be used for Theme Tag entries.' ~ ( settings.themeTagsSection ? '' : ' <a target="_blank" href="'~ url('settings/sections/new' ) ~'">Create a blank section here.</a>' ),
+        fieldClass: 'flex-grow',
+        value: settings.themeTagsSection,
+        options: sections,
+        errors: settings.getErrors( 'themeTagsSection' )
+    }) }}
+
+    {{ forms.selectField({
+        required: true,
+        name: 'topicTagsSection',
+        label: 'Topic Tag Section',
+        instructions: 'Section to be used for Topic Tag entries.' ~ ( settings.topicTagsSection ? '' : ' <a target="_blank" href="'~ url('settings/sections/new' ) ~'">Create a blank section here.</a>' ),
+        fieldClass: 'flex-grow',
+        value: settings.topicTagsSection,
+        options: sections,
+        errors: settings.getErrors( 'topicTagsSection' )
+    }) }}
+
 </div>

@@ -30,6 +30,13 @@ class SettingsModel extends Model
     public $mediaFieldGroup;
     public $showSection;
 
+    public $blogTagsSection;
+    public $dateTagsSection;
+    public $filmTagsSection;
+    public $siteTagsSection;
+    public $themeTagsSection;
+    public $topicTagsSection;
+
     public $apiCraftUser        = '';
     public $apiBaseUrl          = '';
 
@@ -42,21 +49,21 @@ class SettingsModel extends Model
     public $syncSchedule        = ConstantAbstract::SYNC_SCHEDULE;
     public $syncCustomSchedule  = ConstantAbstract::SYNC_CUSTOM_SCHEDULE;
     public $syncPingChangelog   = ConstantAbstract::SYNC_PING_CHANGELOG;
-
+    public $defaultRichtextField = ConstantAbstract::DEFAULT_RICHTEXT_TYPE;
 
     // Public Methods
     // =========================================================================
 
-    public function rules()
+    public function rules(): array
     {
         return [
             [
-                ConstantAbstract::REQUIRED_SETTINGS, 
-                'required' 
+                ConstantAbstract::REQUIRED_SETTINGS,
+                'required'
             ],
             [
-                [ 'apiCraftUser' ], 
-                'required' 
+                [ 'apiCraftUser' ],
+                'required'
             ],
             [
                 [ 'apiBaseUrl' ],

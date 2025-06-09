@@ -6,15 +6,20 @@ use Craft;
 use craft\db\Migration;
 use craft\helpers\ArrayHelper;
 use papertiger\mediamanager\helpers\SettingsHelper;
+use yii\base\Exception;
+use yii\base\InvalidConfigException;
 
 /**
  * m230705_151019_add_marked_for_deletion_field migration.
  */
 class m230705_151024_add_marked_for_deletion_field extends Migration
 {
-    /**
-     * @inheritdoc
-     */
+	/**
+	 * @inheritdoc
+	 * @throws InvalidConfigException
+	 * @throws Exception
+	 * @throws \Throwable
+	 */
     public function safeUp()
     {
 	    $schemaVersion = Craft::$app->projectConfig->get(
@@ -46,17 +51,38 @@ class m230705_151024_add_marked_for_deletion_field extends Migration
 		    if($mediaSection) {
 			    $entryType = $mediaSection->getEntryTypes()[0];
 			    $fieldLayout = $entryType->getFieldLayout();
-			    $allFields = $fieldLayout->getFields();
-			    $fieldLayout->setFields(ArrayHelper::merge([$field], $allFields));
 			    $tabs = $fieldLayout->getTabs();
-			
+					$fieldAdded = false;
+					
+					$newFieldLayoutElement = [
+						'type' => 'craft\fields\Lightswitch',
+						'fieldUid' => $field->uid,
+						'enabled' => true,
+						'required' => false,
+						'sortOrder' => 0,
+					];
+					
 			    foreach($tabs as $tab) {
 				    if ($tab->name === 'API'){
-					    $existingFields = $tab->getFields();
-					    $tab->setFields(ArrayHelper::merge([$field], $existingFields));
+							$elements = $tab->elements;
+							foreach($elements as $element) {
+								if($element->uid === $field->uid) {
+									$fieldAdded = true;
+								}
+							}
+							if(!$fieldAdded){
+								$tab->setElements(array_merge($elements, [$newFieldLayoutElement]));
+					    }
 				    }
 			    }
-			
+					
+					if(!$fieldAdded) {
+						$elements = $tabs[0]->getElements();
+						$tabs[0]->setElements(array_merge($elements, [$newFieldLayoutElement]));
+					}
+					
+					$fieldLayout->setTabs($tabs);
+					Craft::$app->fields->saveLayout($fieldLayout);
 			    $entryType->setFieldLayout($fieldLayout);
 			    Craft::$app->getSections()->saveEntryType($entryType);
 		    }

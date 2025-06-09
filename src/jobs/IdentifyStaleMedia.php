@@ -11,17 +11,8 @@
 namespace papertiger\mediamanager\jobs;
 
 use Craft;
-use craft\helpers\Db;
 use craft\queue\BaseJob;
 use craft\elements\Entry;
-use craft\elements\Asset;
-use craft\elements\Tag;
-use craft\helpers\ElementHelper;
-use craft\helpers\Assets as AssetHelper;
-
-use DateTime;
-use papertiger\mediamanager\MediaManager;
-use papertiger\mediamanager\helpers\SettingsHelper;
 
 class IdentifyStaleMedia extends BaseJob
 {
@@ -52,7 +43,7 @@ class IdentifyStaleMedia extends BaseJob
     // Public Methods
     // =========================================================================
 
-    public function execute( $queue )
+    public function execute( $queue ): void
     {
 
         if (!$this->tags) {
@@ -78,7 +69,7 @@ class IdentifyStaleMedia extends BaseJob
     {
         return Craft::t( 'mediamanager', "Marking entries for deletion." );
     }
-		
+
 
     // Private Methods
     // =========================================================================
@@ -88,7 +79,7 @@ class IdentifyStaleMedia extends BaseJob
 			if(!Craft::$app->queue->hasProperty('jobInfo')){
 				return false;
 			}
-			
+
 			return in_array("Marking entry {$entryId} for deletion.", array_column(Craft::$app->queue->jobInfo, 'description'), true);
 		}
 }

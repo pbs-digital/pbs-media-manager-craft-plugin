@@ -11,7 +11,6 @@
 namespace papertiger\mediamanager\helpers\aftersavesettings;
 
 use Craft;
-use yii\base\Application;
 use craft\models\TagGroup;
 use craft\elements\Tag;
 use craft\fields\Assets;
@@ -33,17 +32,17 @@ class ShowApiColumnFieldsHelper
     // =========================================================================
 
     public static function process()
-    {   
+    {
         // Process API Column & Fields
         $settingName = 'showApiColumnFields';
         $oldSetting  = MediaManager::getInstance()->oldsettings->get( $settingName );
         $oldValue    = [];
         $newValue    = SettingsHelper::get( $settingName );
-        
+
         if( $oldSetting && $oldSetting->settingValue ) {
             $oldValue = $oldSetting->settingValue;
         }
-        
+
         // Compare hash on both new and old settings
         $oldHash = md5( json_encode( $oldValue ) );
         $newHash = md5( json_encode( $newValue ) );
@@ -55,13 +54,13 @@ class ShowApiColumnFieldsHelper
             $tempUpdatedFields = [];
 
             foreach( $newValue as $newField ) {
-                
+
                 $fieldApi      = $newField[ ConstantAbstract::API_COLUMN_FIELD_API_INDEX ];
                 $existingField = $newField[ ConstantAbstract::API_COLUMN_EXISTING_FIELD_INDEX ];
                 $fieldName     = $newField[ ConstantAbstract::API_COLUMN_FIELD_NAME_INDEX ];
                 $fieldHandle   = $newField[ ConstantAbstract::API_COLUMN_FIELD_HANDLE_INDEX ];
-                $fieldType     = $newField[ ConstantAbstract::API_COLUMN_FIELD_TYPE_INDEX ]; 
-                
+                $fieldType     = $newField[ ConstantAbstract::API_COLUMN_FIELD_TYPE_INDEX ];
+
                 $oldSetting = self::getColumnByHandle( $oldValue, $fieldHandle );
 
                 // If using existing field, no need to touch it any further
@@ -71,7 +70,7 @@ class ShowApiColumnFieldsHelper
                     if( !$oldSetting ) {
                         $tempNewFields[] = $newField;
                     } else {
-                        
+
                         // Check if there's field being updated
                         if( $fieldName != $oldSetting[ ConstantAbstract::API_COLUMN_FIELD_NAME_INDEX ] || $fieldType != $oldSetting[ ConstantAbstract::API_COLUMN_FIELD_TYPE_INDEX ] ) {
                             $tempUpdatedFields[] = $newField;
@@ -118,7 +117,7 @@ class ShowApiColumnFieldsHelper
     }
 
     private static function createCraftField( $field )
-    {   
+    {
         // Only create if not exists
         if( !self::findCraftFieldByHandle( $field ) ) {
 
@@ -202,7 +201,7 @@ class ShowApiColumnFieldsHelper
                 if( method_exists( 'ElementHelper', 'generateSlug' ) ) {
                     $tagGroupHandle = ElementHelper::generateSlug( $field[ ConstantAbstract::API_COLUMN_FIELD_NAME_INDEX ] );
                 } else {
-                    $tagGroupHandle = ElementHelper::createSlug( $field[ ConstantAbstract::API_COLUMN_FIELD_NAME_INDEX ] );
+                    $tagGroupHandle = ElementHelper::normalizeSlug( $field[ ConstantAbstract::API_COLUMN_FIELD_NAME_INDEX ] );
                 }
 
                 // Find tag group first
@@ -228,6 +227,9 @@ class ShowApiColumnFieldsHelper
 
                 $fieldInformation[ 'type' ]   = Tags::class;
                 $fieldInformation[ 'source' ] = 'taggroup:' . $tagGroupUid;
+            break;
+            case 'craft\ckeditor\Field':
+                $fieldInformation[ 'type' ] = "craft\ckeditor\Field";
             break;
         }
 
