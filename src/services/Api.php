@@ -31,11 +31,11 @@ class Api extends Component
 {
     // Private Properties
     // =========================================================================
-
-    protected static $sectionMediaHandle;
-    protected static $sectionUsedMediaHandle;
-    protected static $apiBaseUrl;
-    protected static $apiAuth;
+    
+    protected static string $sectionMediaHandle;
+    protected static string $sectionUsedMediaHandle;
+    protected static string $apiBaseUrl;
+    protected static array $apiAuth;
 
 
     // Public Methods
@@ -194,7 +194,7 @@ class Api extends Component
                 foreach( $pages as $page ) {
 
                     foreach( $page[ 'pageBuilder' ]->all() as $parentBlock ) {
-
+                        
                         foreach( $parentBlock[ 'row' ]->all() as $component ) {
 
                             switch( $component[ 'type' ] ) {
@@ -212,7 +212,7 @@ class Api extends Component
                                     }
 
                                     foreach( $component[ 'selectedMedia' ]->anyStatus()->all() as $entry ) {
-
+                                        
                                         array_push( $usedMedia, [
                                             'id' => $entry[ 'id' ],
                                             'title' => $entry[ 'title' ],
@@ -251,7 +251,7 @@ class Api extends Component
             foreach( $entries as $entry ) {
 
                 $mediaManagerId = $entry[ 'mediaManagerId' ];
-
+                
                 if( array_key_exists( $mediaManagerId, $duplicateCounter ) ) {
                     $duplicateCounter[ $mediaManagerId ]++;
                 } else {
@@ -320,7 +320,7 @@ class Api extends Component
             }
 
             return $total;
-
+            
 
         } catch( Exception $e ) {
             return false;
@@ -348,8 +348,6 @@ class Api extends Component
 
         foreach( $seasons->data as $season ) {
 
-            sleep( 3 );
-
             Craft::$app->queue->push( new MediaSync([
 
                 'siteId'      => $show->siteId,
@@ -365,8 +363,6 @@ class Api extends Component
             $episodes = $this->getEpisodesOfShow( $season->id );
 
             foreach( $episodes->data as $episode ) {
-
-                sleep( 3 );
 
                 Craft::$app->queue->push( new MediaSync([
 
@@ -385,8 +381,6 @@ class Api extends Component
         $specials = $this->getSpecialsOfShow( $show->apiKey );
 
         foreach( $specials->data as $special ) {
-
-            sleep( 3 );
 
             Craft::$app->queue->push( new MediaSync([
 

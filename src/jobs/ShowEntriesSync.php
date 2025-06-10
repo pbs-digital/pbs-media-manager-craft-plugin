@@ -11,12 +11,14 @@
 namespace papertiger\mediamanager\jobs;
 
 use Craft;
+use craft\db\Query;
 use craft\errors\ElementNotFoundException;
 use craft\helpers\DateTimeHelper;
 use craft\helpers\Json;
 use craft\queue\BaseJob;
 use craft\elements\Entry;
 use craft\elements\Asset;
+use craft\elements\Tag;
 use craft\helpers\FileHelper;
 use craft\helpers\ElementHelper;
 use craft\helpers\Assets as AssetHelper;
@@ -94,6 +96,26 @@ class ShowEntriesSync extends BaseJob
         $isNew = !$existingEntry;
         $entry               = $this->chooseOrCreateShowEntry( $showAttributes->title, $existingEntry );
 
+				$showImages = $showAttributes->images;
+				$showImagesKeywords = ['mezzanine', 'poster', 'white', 'black', 'color'];
+				$showImageArray = [];
+
+				if(isset($showImages) && is_array($showImages)) {
+					foreach( $showAttributes->images as $image ) {
+
+						foreach($showImagesKeywords as $keyword){
+							if(str_contains($image->profile, $keyword)) {
+
+								$asset = $this->createOrUpdateImage( $showAttributes->title, $image, $image->profile);
+								if( $asset && isset( $asset->id ) ) {
+									$showImageArray[$keyword] = $asset->id;
+								}
+							}
+						}
+
+					}
+				}
+
         // Set default field Values
         $defaultFields = [];
 
@@ -110,6 +132,31 @@ class ShowEntriesSync extends BaseJob
 		        }
 
             switch( $apiField ) {
+	              case 'episode_availability':
+									// There is probably a much cleaner / more straightforward way of doing this
+									// we need to get the latest episode of the latest season so we have to jump through a handful of URLs to get there
+									$seasonsUrl = $showEntry->links->seasons;
+		              $seasonData = $this->fetchShowEntry($seasonsUrl);
+									if(!$seasonData){
+										break;
+									}
+									$episodesUrl = $seasonData[0]->links->episodes;
+									$episodesData = $this->fetchShowEntry($episodesUrl);
+									if(!$episodesData){
+										break;
+									}
+									$episodeAssetsUrl = $episodesData[0]->links->assets;
+		              $episodeAssets = $this->fetchShowEntry($episodeAssetsUrl);
+
+									if(!$episodeAssets) {
+										break;
+									}
+									$episodeAsset = $episodeAssets[0] ?? null;
+									if($episodeAsset) {
+										$availability = new \DateTime($episodeAsset->attributes->availabilities->public->end) ?? null;
+										$fieldHandle = SynchronizeHelper::getApiField($apiField, 'showApiColumnFields');
+										$defaultFields[ $fieldHandle ] = $availability;
+									}
                 case 'show_images':
 
                     $imagesHandle = SynchronizeHelper::getShowImagesField();
@@ -150,7 +197,46 @@ class ShowEntriesSync extends BaseJob
                     }
 
                 break;
-                case 'show_address':
+
+	              case 'show_mezzanine':
+		              $fieldHandle = SynchronizeHelper::getApiField('show_mezzanine', 'showApiColumnFields');
+
+		              if( isset($showImageArray['mezzanine']) ) {
+			              $defaultFields[$fieldHandle] = [$showImageArray['mezzanine']];
+		              }
+								break;
+
+	              case 'show_poster':
+		              $fieldHandle = SynchronizeHelper::getApiField('show_poster', 'showApiColumnFields');
+		              if( isset($showImageArray['poster']) ) {
+			              $defaultFields[$fieldHandle] = [$showImageArray['poster']];
+		              }
+                break;
+
+	              case 'show_white_logo':
+			            $fieldHandle = SynchronizeHelper::getApiField('show_white_logo', 'showApiColumnFields');
+
+			            if( isset($showImageArray['white']) ) {
+				            $defaultFields[$fieldHandle] = [$showImageArray['white']];
+			            }
+		            break;
+
+	              case 'show_black_logo':
+			            $fieldHandle = SynchronizeHelper::getApiField('show_black_logo', 'showApiColumnFields');
+			            if( isset($showImageArray['black']) ) {
+				            $defaultFields[$fieldHandle] = [$showImageArray['black']];
+			            }
+		            break;
+
+	              case 'show_color_logo':
+			            $fieldHandle = SynchronizeHelper::getApiField('show_color_logo', 'showApiColumnFields');
+
+			            if( isset($showImageArray['color']) ) {
+				            $defaultFields[$fieldHandle] = [$showImageArray['color']];
+			            }
+		            break;
+
+								case 'show_address':
                     if( isset( $showAttributes->slug ) ) {
                         $defaultFields[ SynchronizeHelper::getApiField( $apiField, 'showApiColumnFields' ) ] = 'https://pbs.org/show/' . $showAttributes->slug;
                     }
@@ -191,6 +277,54 @@ class ShowEntriesSync extends BaseJob
                 case 'description_short':
                     $defaultFields[ SynchronizeHelper::getApiField( $apiField, 'showApiColumnFields' ) ] = $showAttributes->description_short;
                 break;
+
+	              case 'links':
+
+			            if(isset($showAttributes->links) && is_array($showAttributes->links)) {
+
+				            $createTable = [];
+				            $count = 0;
+
+				            foreach($showAttributes->links as $link) {
+					            $createTable[$count]['col1'] = $link->value;
+					            $createTable[$count]['col2'] = $link->profile;
+					            $createTable[$count]['col3'] = new \DateTime( $link->updated_at );
+					            $count++;
+				            }
+
+				            $defaultFields[SynchronizeHelper::getApiField($apiField, 'showApiColumnFields')] = $createTable;
+
+			            }
+
+		            break;
+
+	            case 'platform_availability':
+
+		            if(isset($showAttributes->platforms) && is_array($showAttributes->platforms)) {
+
+			            $createTable = [];
+			            $count = 0;
+
+			            foreach($showAttributes->platforms as $platform) {
+				            $createTable[$count]['col1'] = $platform->name;
+				            $createTable[$count]['col2'] = $platform->slug;
+				            $createTable[$count]['col3'] = new \DateTime( $platform->updated_at );
+				            $count++;
+			            }
+
+			            $defaultFields[SynchronizeHelper::getApiField($apiField, 'showApiColumnFields')] = $createTable;
+		            }
+
+		            break;
+
+                case 'slug':
+
+                    if(isset($showAttributes->slug)){
+                        $defaultFields[SynchronizeHelper::getApiField($apiField, 'showApiColumnFields')] = $showAttributes->slug;
+                    }
+
+                    break;
+
                 case 'premiered_on':
                     if( $showAttributes->premiered_on != null) {
                         $defaultFields[ SynchronizeHelper::getApiField( $apiField, 'showApiColumnFields' ) ] = new \DateTime( $showAttributes->premiered_on );
@@ -437,7 +571,7 @@ class ShowEntriesSync extends BaseJob
     private function copyImageToServer( $url )
     {
         $image     = file_get_contents( $url );
-        $extension = pathinfo( $url )[ 'extension' ];
+        $extension = isset(pathinfo( $url )[ 'extension' ]) ? pathinfo( $url )[ 'extension' ] : '.jpg';
         $localPath = AssetHelper::tempFilePath( $extension );
 
         file_put_contents( $localPath, $image );
@@ -445,37 +579,20 @@ class ShowEntriesSync extends BaseJob
         return $localPath;
     }
 
-    private function createOrUpdateImage( $entryTitle, $imageInfo, $profile )
+    private function createOrUpdateImage($entryTitle, $imageInfo, $profile)
     {
-        $imageUrl  = $imageInfo->image;
-        $extension = pathinfo( $imageUrl )[ 'extension' ];
-        $slug      = ElementHelper::normalizeSlug( $entryTitle );
-        $filename  = $slug . '-' . md5( ElementHelper::normalizeSlug( $imageUrl ) ) . '.' . $extension;
-        $asset     = Asset::findOne( [ 'filename' => $filename ] );
+        $imageUrl = $imageInfo->image;
 
-        if( $asset ) {
+        $extension = isset(pathinfo($imageUrl)['extension']) ? pathinfo($imageUrl)['extension'] : '.jpg';
+        $slug = ElementHelper::normalizeSlug($entryTitle);
+        $filename = $slug . '-' . md5(ElementHelper::normalizeSlug($imageUrl)) . '.' . $extension;
+        $asset = Asset::findOne(['filename' => $filename]);
 
-
-            Craft::$app->elements->deleteElement($asset);
-
-            /*
-            if( $asset->mmAssetProfile ) {
-
-                return $asset;
-
-            } else {
-
-                $asset->setFieldValue( 'mmAssetProfile', $profile);
-                Craft::$app->getElements()->saveElement( $asset );
-
-                return $asset;
-
-            }
-            */
-
+        if ($asset) {
+            return $asset;
         }
 
-        return $this->createImageAsset( $imageUrl, $filename, $profile );
+        return $this->createImageAsset($imageUrl, $filename, $profile);
     }
 
     private function createImageAsset( $imageUrl, $filename, $profile )

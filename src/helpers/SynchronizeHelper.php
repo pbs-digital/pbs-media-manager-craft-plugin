@@ -23,46 +23,50 @@ class SynchronizeHelper
     // Public Static Methods
     // =========================================================================
 
-    public static function getSectionId()
+    public static function getSectionId(): ?int
     {
         $section = Craft::$app->sections->getSectionByHandle( SettingsHelper::get( 'mediaSection' ) );
 
         if( !$section ) {
-            return false;
+            return null;
         }
 
         return $section->id;
     }
 
-    public static function getSectionTypeId()
+    public static function getSectionTypeId(): ?int
     {
         $sectionId  = self::getSectionId();
         $entryTypes = Craft::$app->sections->getEntryTypesBySectionId( $sectionId );
 
         if( !is_array( $entryTypes ) && !$entryTypes[ 0 ] ) {
-            return false;
+            return null;
         }
 
         return $entryTypes[ 0 ]->id;
     }
 
-    public static function getShowSectionId()
+    public static function getShowSectionId(): ?int
     {
         $section = Craft::$app->sections->getSectionByHandle( SettingsHelper::get( 'showSection' ) );
 
         if( !$section ) {
-            return false;
+            return null;
         }
 
         return $section->id;
     }
 
-    public static function getBlogTagSectionInfo()
+    public static function getBlogTagSectionInfo(): ?array
     {
+        if( !SettingsHelper::get( 'blogTagsSection' ) ) {
+            return null;
+        }
+
         $section = Craft::$app->sections->getSectionByHandle( SettingsHelper::get( 'blogTagsSection' ) );
 
         if( !$section ) {
-            return false;
+            return null;
         }
 
         $sectionId = $section->id;
@@ -76,12 +80,16 @@ class SynchronizeHelper
         return $res;
     }
 
-    public static function getDateTagSectionInfo()
+    public static function getDateTagSectionInfo(): ?array
     {
+        if( !SettingsHelper::get( 'dateTagsSection' ) ) {
+            return null;
+        }
+
         $section = Craft::$app->sections->getSectionByHandle( SettingsHelper::get( 'dateTagsSection' ) );
 
         if( !$section ) {
-            return false;
+            return null;
         }
 
         $sectionId = $section->id;
@@ -95,12 +103,16 @@ class SynchronizeHelper
         return $res;
     }
 
-    public static function getFilmTagSectionInfo()
+    public static function getFilmTagSectionInfo(): ?array
     {
+        if( !SettingsHelper::get( 'filmTagsSection' ) ) {
+            return null;
+        }
+
         $section = Craft::$app->sections->getSectionByHandle( SettingsHelper::get( 'filmTagsSection' ) );
 
         if( !$section ) {
-            return false;
+            return null;
         }
 
         $sectionId = $section->id;
@@ -114,12 +126,17 @@ class SynchronizeHelper
         return $res;
     }
 
-    public static function getSiteTagSectionInfo()
+    public static function getSiteTagSectionInfo(): ?array
     {
+
+        if( !SettingsHelper::get( 'siteTagsSection' ) ) {
+            return null;
+        }
+
         $section = Craft::$app->sections->getSectionByHandle( SettingsHelper::get( 'siteTagsSection' ) );
 
         if( !$section ) {
-            return false;
+            return null;
         }
 
         $sectionId = $section->id;
@@ -133,12 +150,16 @@ class SynchronizeHelper
         return $res;
     }
 
-    public static function getThemeTagSectionInfo()
+    public static function getThemeTagSectionInfo(): ?array
     {
+        if( !SettingsHelper::get( 'themeTagsSection' ) ) {
+            return null;
+        }
+
         $section = Craft::$app->sections->getSectionByHandle( SettingsHelper::get( 'themeTagsSection' ) );
 
         if( !$section ) {
-            return false;
+            return null;
         }
 
         $sectionId = $section->id;
@@ -152,12 +173,16 @@ class SynchronizeHelper
         return $res;
     }
 
-    public static function getTopicTagSectionInfo()
+    public static function getTopicTagSectionInfo(): ?array
     {
+        if( !SettingsHelper::get( 'topicTagsSection' ) ) {
+            return null;
+        }
+
         $section = Craft::$app->sections->getSectionByHandle( SettingsHelper::get( 'topicTagsSection' ) );
 
         if( !$section ) {
-            return false;
+            return null;
         }
 
         $sectionId = $section->id;
@@ -170,14 +195,42 @@ class SynchronizeHelper
         }
         return $res;
     }
+
+    // public static function getAssetTypeSectionInfo(): ?array
+    // {
+    //     if( !SettingsHelper::get( 'assetTypeTagsSection' ) ) {
+    //         return null;
+    //     }
+
+    //     $section = Craft::$app->sections->getSectionByHandle( SettingsHelper::get( 'assetTypeTagsSection' ) );
+
+    //     if( !$section ) {
+    //         return null;
+    //     }
+
+    //     $sectionId = $section->id;
+    //     $entryTypeId = Craft::$app->sections->getEntryTypesBySectionId( $sectionId );
+
+    //     $res = ['id' => $sectionId];
+
+    //     if($entryTypeId){
+    //         $res['entryTypeId'] = $entryTypeId[0]->id;
+    //     }
+    //     return $res;
+    // }
 
     public static function getShowSectionTypeId()
     {
         $sectionId  = self::getShowSectionId();
+
+        if( !$sectionId ) {
+            return null;
+        }
+
         $entryTypes = Craft::$app->sections->getEntryTypesBySectionId( $sectionId );
 
         if( !is_array( $entryTypes ) && !$entryTypes[ 0 ] ) {
-            return false;
+            return null;
         }
 
         return $entryTypes[ 0 ]->id;
@@ -188,7 +241,7 @@ class SynchronizeHelper
         $user = Craft::$app->users->getUserByUsernameOrEmail( SettingsHelper::get( 'apiCraftUser' ) );
 
         if( !$user ) {
-            return false;
+            return null;
         }
 
         return $user->id;
@@ -204,13 +257,13 @@ class SynchronizeHelper
         $volume = Craft::$app->volumes->getVolumeByHandle( SettingsHelper::get( 'mediaAssetVolume' ) );
 
         if( !$volume ) {
-            return false;
+            return null;
         }
 
         $folder = Craft::$app->assets->findFolder( [ 'parentId' => $volume->id ] );
 
         if( !$folder ) {
-            return false;
+            return null;
         }
 
         return $folder->id;
@@ -296,16 +349,21 @@ class SynchronizeHelper
         $field = Craft::$app->fields->getFieldByHandle( $craftFieldHandle );
 
         if( !$field || !$field->source ) {
-            return false;
+            return null;
         }
 
         $tagGroup = Craft::$app->tags->getTagGroupByUid( str_replace( 'taggroup:', '', $field->source ) );
 
         if( !$tagGroup ) {
-            return false;
+            return null;
         }
 
         return $tagGroup->id;
+    }
+
+    public static function hasSiteBeenEntrified(): bool
+    {
+        return (bool)(self::getBlogTagSectionInfo() || self::getDateTagSectionInfo() || self::getFilmTagSectionInfo() || self::getSiteTagSectionInfo() || self::getThemeTagSectionInfo() || self::getTopicTagSectionInfo());
     }
 
     public static function apiChangelog( $since = null, $id = null, $type = null )
@@ -366,7 +424,7 @@ class SynchronizeHelper
         $foundIndex     = array_search( $fieldApiHandle, $fieldHandles );
 
         if( $foundIndex === false ) {
-            return false;
+            return null;
         }
 
         $foundField    = $fieldsToSearch[ $foundIndex ];
@@ -387,7 +445,7 @@ class SynchronizeHelper
         $foundIndex     = array_search( $fieldApiHandle, $fieldHandles );
 
         if( $foundIndex === false ) {
-            return false;
+            return null;
         }
 
         $foundField = $fieldsToSearch[ $foundIndex ];

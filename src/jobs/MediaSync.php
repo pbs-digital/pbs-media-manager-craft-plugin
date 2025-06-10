@@ -35,46 +35,45 @@ class MediaSync extends BaseJob
     // Private Properties
     // =========================================================================
 
-    protected $apiBaseUrl;
-    protected $sectionId;
-    protected $typeId;
-    protected $authorId;
-    protected $authorUsername;
-    protected $mediaFolderId;
-    protected $logProcess;
-    protected $logFile;
+    protected string $apiBaseUrl;
+    protected int $sectionId;
+    protected int $typeId;
+    protected int $authorId;
+    protected string $authorUsername;
+    protected int $mediaFolderId;
+    protected int $logProcess;
+    protected string $logFile;
 
 
     // Public Properties
     // =========================================================================
 
-    public $assetType;
-    public $siteId;
-    public $title;
-    public $auth;
+    public string $assetType = '';
+    public array $siteId = [];
+    public string $title = '';
+    public array $auth = [];
 
-    public $apiKey;
-    public $singleAsset;
-    public $singleAssetKey;
+    public string $apiKey = '';
+    public bool $singleAsset = false;
+    public ?string $singleAssetKey = null;
 
-    public $forceRegenerateThumbnail;
+    public bool $forceRegenerateThumbnail = false;
 
 
 		/**
 		 * @var string|array
 		 */
-		public $fieldsToSync = '*';
+		public string|array $fieldsToSync = '*';
 
-    public $siteTags = [];
-    public $filmTags = [];
-    public $topicTags = [];
+    public array $siteTags = [];
+    public array $filmTags = [];
+    public array $topicTags = [];
 
 
     // Private Properties
     // =========================================================================
 
     private $dateWithMs = 'Y-m-d\TH:i:s.uP';
-
 
     // Public Methods
     // =========================================================================
@@ -218,8 +217,6 @@ class MediaSync extends BaseJob
                         $siteTagGroupId     = SynchronizeHelper::getTagGroupIdByCraftFieldHandle( $siteTagFieldHandle );
 
                         // Generate Site Tags
-                        $siteTags = [];
-
                         if( !is_array( $this->siteId ) ) {
                             $this->siteId = json_decode( $this->siteId );
                         }
@@ -227,29 +224,29 @@ class MediaSync extends BaseJob
                         foreach( $this->siteId as $siteId ) {
 
                             $site = Craft::$app->sites->getSiteById( $siteId );
-                            if($site) {
-
-                                $siteTagSectionInfo = SynchronizeHelper::getSiteTagSectionInfo();
-                                $tag = $this->findOrCreateTag($site->name, $siteTagSectionInfo);
-
-                                if ($tag) {
-                                    array_push($siteTags, $tag->id);
-                                }
+                            
+                            if(SynchronizeHelper::hasSiteBeenEntrified() && $siteTagSectionInfo = SynchronizeHelper::getSiteTagSectionInfo()){
+                                $tag = $this->findOrCreateTagEntry($site->name, $siteTagSectionInfo);
+                            } else {
+                                $tag = $this->findOrCreateTag($site->name, $siteTagGroupId);
+                            }
+                            
+                            if($tag){
+                                $this->siteTags[] = $tag->id;
                             }
 
                         }
-												$this->siteTags = $siteTags;
-                        $defaultFields[ $siteTagFieldHandle ] = $siteTags;
+
+                        $defaultFields[ $siteTagFieldHandle ] = $this->siteTags;
 
                     break;
                     case 'film_tags':
 
                         // Prepare craft field handle and prepare tag group id
                         $filmTagFieldHandle = SynchronizeHelper::getFilmTagsField();
-                        $filmTagSectionInfo = SynchronizeHelper::getFilmTagSectionInfo();
+                        
                         // Generate Film Tags
                         $parentTree = $assetAttributes->parent_tree;
-                        $filmTags   = [];
 
                         if( $parentTree ) {
 
@@ -262,48 +259,57 @@ class MediaSync extends BaseJob
                             }
 
                             if( $parentAttributes && isset( $parentAttributes->show ) && isset( $parentAttributes->show->attributes ) && isset( $parentAttributes->show->attributes->title ) ) {
-                                $film = $this->findOrCreateTag( $parentAttributes->show->attributes->title, $filmTagSectionInfo );
+                                if(SynchronizeHelper::hasSiteBeenEntrified() && $filmTagSectionInfo = SynchronizeHelper::getFilmTagSectionInfo()){
+                                    $film = $this->findOrCreateTagEntry( $parentAttributes->show->attributes->title, $filmTagSectionInfo );
+                                } else {
+                                    $filmTagGroupId = SynchronizeHelper::getTagGroupIdByCraftFieldHandle($filmTagFieldHandle);
+                                    $film = $this->findOrCreateTag($parentAttributes->show->attributes->title, $filmTagGroupId);
+                                }
                             }
 
                             if( !$film && $parentTree->type == 'show' && isset( $parentTree->attributes ) && isset( $parentTree->attributes->title ) ) {
-                                $film = $this->findOrCreateTag( $parentTree->attributes->title, $filmTagSectionInfo );
+                                if(SynchronizeHelper::hasSiteBeenEntrified() && $filmTagSectionInfo = SynchronizeHelper::getFilmTagSectionInfo()){
+                                    $film = $this->findOrCreateTagEntry( $parentTree->attributes->title, $filmTagSectionInfo );
+                                } else {
+                                    $filmTagGroupId = SynchronizeHelper::getTagGroupIdByCraftFieldHandle($filmTagFieldHandle);
+                                    $film = $this->findOrCreateTag($parentTree->attributes->title, $filmTagGroupId);
+                                }
                             }
 
                             if( $film ) {
-                                $filmTags[] = $film->id;
+                                $this->filmTags[] = $film->id;
                             }
                         }
 
-												$this->filmTags = $filmTags;
-                        $defaultFields[ $filmTagFieldHandle ] = $filmTags;
+                        $defaultFields[ $filmTagFieldHandle ] = $this->filmTags;
 
                     break;
                     case 'topic_tags':
 
                         // Prepare craft field handle and prepare tag group id
                         $topicTagFieldHandle = SynchronizeHelper::getTopicTagsField();
-                        $topicTagSectionInfo = SynchronizeHelper::getTopicTagSectionInfo();
                         // Generate Topic Tags
                         $topicAttributes = $assetAttributes->topics;
-                        $topicTags       = [];
 
                         if( $topicAttributes ) {
-
                             foreach( $topicAttributes as $topic ) {
 
                                 if( isset( $topic->name ) ) {
+                                    if(SynchronizeHelper::hasSiteBeenEntrified() && $topicTagSectionInfo = SynchronizeHelper::getTopicTagSectionInfo()){
+                                        $tag = $this->findOrCreateTagEntry( $topic->name, $topicTagSectionInfo );
+                                    } else {
+                                        $tagGroupId = SynchronizeHelper::getTagGroupIdByCraftFieldHandle($topicTagFieldHandle);
+                                        $tag = $this->findOrCreateTag($topic->name, $tagGroupId);
+                                    }
 
-                                    $tag = $this->findOrCreateTag( $topic->name, $topicTagSectionInfo );
-
-                                    if( $tag ) {
-                                        array_push( $topicTags, $tag->id );
+                                    if ($tag) {
+                                        $this->topicTags[] = $tag->id;
                                     }
                                 }
                             }
                         }
 
-												$this->topicTags = $topicTags;
-                        $defaultFields[ $topicTagFieldHandle ] = $topicTags;
+                        $defaultFields[ $topicTagFieldHandle ] = $this->topicTags;
 
                     break;
                     case 'expiration_status':
@@ -387,6 +393,13 @@ class MediaSync extends BaseJob
 
             // Process additional fields
             $defaultFields = $this->processAdditionalFields( $defaultFields, $assetAttributes, $existingEntry, $entry, $this->forceRegenerateThumbnail );
+
+            // TODO : Feature Gate for Food Site? I think this was never actually used or implemented. Leaving for posterity
+            // if (SynchronizeHelper::getTagGroupIdByCraftFieldHandle('assetType')) {
+            //     // TODO : Support Entrified and non-Entrified status
+            //     $assetTypeTag = $this->findOrCreateTagEntry($this->assetType, SynchronizeHelper::getTagGroupIdByCraftFieldHandle('assetType'));
+            //     $entry->setFieldValue('assetType', [$assetTypeTag->id]);
+            // }
 
             // Set field values and properties
             $entry->setFieldValues( $defaultFields );
@@ -480,7 +493,7 @@ class MediaSync extends BaseJob
         return $response->data;
     }
 
-    private function findOrCreateTag( $title, $sectionInfo )
+    private function findOrCreateTagEntry( $title, $sectionInfo )
     {
         if( !$sectionInfo ) {
             return null;
@@ -500,6 +513,25 @@ class MediaSync extends BaseJob
             $tag->title   = $title;
             $tag->authorId = $this->authorId;
             Craft::$app->getElements()->saveElement( $tag );
+        }
+
+        return $tag;
+    }
+
+    private function findOrCreateTag($title, $groupId)
+    {
+        $tag = Tag::find()
+            ->where(['title' => $title])
+            ->groupId($groupId)
+            ->one();
+
+        if (!$tag) {
+
+            $tag          = new Tag();
+            $tag->title   = $title;
+            $tag->groupId = $groupId;
+
+            Craft::$app->getElements()->saveElement($tag);
         }
 
         return $tag;
@@ -789,6 +821,8 @@ class MediaSync extends BaseJob
         if( !$minutes && $seconds ) {
             return "${seconds}s";
         }
+
+        return $seconds;
     }
 
 		private function _sanitizeSiteId()

@@ -23,22 +23,22 @@ class IdentifyStaleMedia extends BaseJob
     /**
      * @var string
      */
-    public $date;
+    public string $date;
 
     /**
      * @var string
      */
-    public $tags;
+    public string $tags;
 
     /**
      * @var int
      */
-    public $sectionId;
+    public int $sectionId;
 
     /**
      * @var int|array
      */
-    public $siteId;
+    public int|array $siteId;
 
     // Public Methods
     // =========================================================================

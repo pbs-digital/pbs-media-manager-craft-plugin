@@ -36,6 +36,7 @@ class SettingsModel extends Model
     public $siteTagsSection;
     public $themeTagsSection;
     public $topicTagsSection;
+    // public $assetTypeTagsSection;
 
     public $apiCraftUser        = '';
     public $apiBaseUrl          = '';

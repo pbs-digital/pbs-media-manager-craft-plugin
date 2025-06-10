@@ -149,4 +149,15 @@
         errors: settings.getErrors( 'topicTagsSection' )
     }) }}
 
+    {# {{ forms.selectField({
+        required: true,
+        name: 'assetTypeTagsSection',
+        label: 'Asset Type Tag Section',
+        instructions: 'Section to be used for Asset Type Tag entries.' ~ ( settings.assetTypeTagsSection ? '' : ' <a target="_blank" href="'~ url('settings/sections/new' ) ~'">Create a blank section here.</a>' ),
+        fieldClass: 'flex-grow',
+        value: settings.assetTypeTagsSection,
+        options: sections,
+        errors: settings.getErrors( 'assetTypeTagsSection' )
+    }) }} #}
+
 </div>

@@ -60,10 +60,45 @@
                 options: [
                     {"label":"— Select Field —"},
                     {"optgroup":"Special Field","label":"Special Field"},
-                        {"value":"thumbnail","label":"Thumbnail"},{"value":"display_passport_icon","label":"Display Passport Icon?"},{"value":"last_synced","label":"Last Synced"},{"value":"site_tags","label":"Site Tags"},{"value":"film_tags","label":"Film Tags"},{"value":"topic_tags","label":"Topic Tags"},{"value":"expiration_status","label":"Expiration Status"},{"value":"media_manager_id","label":"Media Manager ID"},
-                        {"value":"season","label":"Season"},{"value":"episode","label":"Episode"},
+                        {"value":"thumbnail","label":"Thumbnail"},
+                        {"value":"display_passport_icon","label":"Display Passport Icon?"},
+                        {"value":"last_synced","label":"Last Synced"},
+                        {"value":"site_tags","label":"Site Tags"},
+                        {"value":"film_tags","label":"Film Tags"},
+                        {"value":"topic_tags","label":"Topic Tags"},
+                        {"value":"expiration_status","label":"Expiration Status"},
+                        {"value":"media_manager_id","label":"Media Manager ID"},
+                        {"value":"season","label":"Season"},
+                        {"value":"episode","label":"Episode"},
                     {"optgroup":"From PBS API","label":"From PBS API"},
-                        {"value":"slug","label":"slug"},{"value":"title","label":"title"},{"value":"title_sortable","label":"title_sortable"},{"value":"description_short","label":"description_short"},{"value":"description_long","label":"description_long"},{"value":"object_type","label":"object_type"},{"value":"premiered_on","label":"premiered_on"},{"value":"encored_on","label":"encored_on"},{"value":"is_excluded_from_dfp","label":"is_excluded_from_dfp"},{"value":"duration","label":"duration"},{"value":"content_rating","label":"content_rating"},{"value":"content_rating_descriptor","label":"content_rating_descriptor"},{"value":"can_embed_player","label":"can_embed_player"},{"value":"tags","label":"tags"},{"value":"language","label":"language"},{"value":"funder_message","label":"funder_message"},{"value":"images","label":"images"},{"value":"updated_at","label":"updated_at"},{"value":"countries","label":"countries"},{"value":"geo_profile","label":"geo_profile"},{"value":"topics","label":"topics"},{"value":"platforms","label":"platforms"},{"value":"player_code","label":"player_code"},{"value":"availabilities","label":"availabilities"},{"value":"related_links","label":"related_links"},{"value":"related_promos","label":"related_promos"},{"value":"parent_tree","label":"parent_tree"},{"value":"has_captions","label":"has_captions"}
+                        {"value":"slug","label":"slug"},
+                        {"value":"title","label":"title"},
+                        {"value":"title_sortable","label":"title_sortable"},
+                        {"value":"description_short","label":"description_short"},
+                        {"value":"description_long","label":"description_long"},
+                        {"value":"object_type","label":"object_type"},
+                        {"value":"premiered_on","label":"premiered_on"},
+                        {"value":"encored_on","label":"encored_on"},
+                        {"value":"is_excluded_from_dfp","label":"is_excluded_from_dfp"},
+                        {"value":"duration","label":"duration"},
+                        {"value":"content_rating","label":"content_rating"},
+                        {"value":"content_rating_descriptor","label":"content_rating_descriptor"},
+                        {"value":"can_embed_player","label":"can_embed_player"},
+                        {"value":"tags","label":"tags"},
+                        {"value":"language","label":"language"},
+                        {"value":"funder_message","label":"funder_message"},
+                        {"value":"images","label":"images"},
+                        {"value":"updated_at","label":"updated_at"},
+                        {"value":"countries","label":"countries"},
+                        {"value":"geo_profile","label":"geo_profile"},
+                        {"value":"topics","label":"topics"},
+                        {"value":"platforms","label":"platforms"},
+                        {"value":"player_code","label":"player_code"},
+                        {"value":"availabilities","label":"availabilities"},
+                        {"value":"related_links","label":"related_links"},
+                        {"value":"related_promos","label":"related_promos"},
+                        {"value":"parent_tree","label":"parent_tree"},
+                        {"value":"has_captions","label":"has_captions"}
                 ]
             },
             {
@@ -98,8 +133,13 @@
                 type: 'select',
                 options: [
                     {"label":"— Select Field Type —"},
-                    {"value":"craft\\fields\\Assets","label":"Assets"},{"value":"craft\\fields\\Date","label":"Date/Time"},{"value":"craft\\fields\\Lightswitch","label":"Lightswitch"},{"value":"craft\\fields\\PlainText","label":"Plain Text"},{"value":"craft\\redactor\\Field","label":"Redactor"},
-                    {"value":"craft\\ckeditor\\Field","label":"CKEditor"},{"value":"craft\\fields\\Tags","label":"Tags"}
+                    {"value":"craft\\fields\\Assets","label":"Assets"},
+                    {"value":"craft\\fields\\Date","label":"Date/Time"},
+                    {"value":"craft\\fields\\Lightswitch","label":"Lightswitch"},
+                    {"value":"craft\\fields\\PlainText","label":"Plain Text"},
+                    {"value":"craft\\redactor\\Field","label":"Redactor"},
+                    {"value":"craft\\ckeditor\\Field","label":"CKEditor"},
+                    {"value":"craft\\fields\\Tags","label":"Tags"}
                 ]
             }
         ]
@@ -156,8 +196,16 @@
                         "label":"episodes_count"
                     },
                     {
+                        "value": "episode_availability",
+                        "label": "Episode Availability",
+                    },
+                    {
                         "value":"links",
                         "label":"links"
+                    },
+                    {
+                        "value": "platform_availability",
+                        "label": "Platform Availability"
                     },
                     {
                         "value": "stream_with_passport",
@@ -186,7 +234,31 @@
                     {
                         "value":"available_for_purchase",
                         "label":"Available for Purchase"
-                    }
+                    },
+                    {
+                        "value": "slug",
+                        "label": "Slug",
+                    },
+                    {
+                        "value": "show_mezzanine",
+                        "label": "Mezzanine (Image)"
+                    },
+                    {
+                        "value": "show_poster",
+                        "label": "Poster (Image)"
+                    },
+                    {
+                        "value": "show_white_logo",
+                        "label": "Logo (White)"
+                    },
+                    {
+                        "value": "show_black_logo",
+                        "label": "Logo (Black)"
+                    },
+                    {
+                        "value": "show_color_logo",
+                        "label": "Logo (Color)"
+                    },
                 ]
             },
             {
@@ -220,13 +292,14 @@
                 width: '20%',
                 type: 'select',
                 options: [
-                {"value":"craft\\fields\\Assets","label":"Assets"},
-                {"value":"craft\\fields\\Date","label":"Date/Time"},
-                {"value":"craft\\fields\\Lightswitch","label":"Lightswitch"},
-                {"value":"craft\\fields\\PlainText","label":"Plain Text"},
-                {"value":"craft\\redactor\\Field","label":"Redactor"},
-                {"value":"craft\\ckeditor\\Field","label":"CKEditor"},
-                {"value":"craft\\fields\\Entry","label":"Entry"}
+                    {"label":"— Select Field Type —"},
+                    {"value":"craft\\fields\\Assets","label":"Assets"},
+                    {"value":"craft\\fields\\Date","label":"Date/Time"},
+                    {"value":"craft\\fields\\Lightswitch","label":"Lightswitch"},
+                    {"value":"craft\\fields\\PlainText","label":"Plain Text"},
+                    {"value":"craft\\redactor\\Field","label":"Redactor"},
+                    {"value":"craft\\ckeditor\\Field","label":"CKEditor"},
+                    {"value":"craft\\fields\\Tags","label":"Tags"}
                 ]
             }
         ]
