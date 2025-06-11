@@ -2,32 +2,28 @@
 /**
  * Media Manager
  *
- * @package       PaperTiger:MediaManager
- * @author        Paper Tiger
- * @copyright     Copyright (c) 2020 Paper Tiger
- * @link          https://www.papertiger.com/
+ * @package       Media Manager
+ * @author        PBS Digital
+ * @link          https://github.com/pbs-digital/pbs-media-manager-craft-plugin
  */
 
-namespace papertiger\mediamanager\base;
+namespace pbsdigital\mediamanager\base;
 
 abstract class ConstantAbstract
 {
     // Constants
     // =========================================================================
 
+		const DEPENDENCY_PLUGIN_CRAFT_RICHTEXT_PLUGINS = [
+			'ckeditor' => ['handle' => 'ckeditor', 'package' => 'craftcms/ckeditor', 'fieldtype' => 'craft\ckeditor\Field', 'version' => '^3.0.0'],
+			'redactor' => ['handle' => 'redactor', 'package' => 'craftcms/redactor', 'fieldtype' => 'craft\redactor\Field', 'version' => '^3.0.0']
+		];
+
+		const DEFAULT_RICHTEXT_TYPE = self::DEPENDENCY_PLUGIN_CRAFT_RICHTEXT_PLUGINS['ckeditor'];
     const DEPENDENCY_PLUGIN_CRAFT_REDACTOR_HANDLE  = 'redactor';
     const DEPENDENCY_PLUGIN_CRAFT_REDACTOR_PACKAGE = 'craftcms/redactor';
     const DEPENDENCY_PLUGIN_CRAFT_REDACTOR_VERSION = '>=2.3.0';
-    
-    const API_USER_USERNAME  = 'user';
-    const API_USER_PASSWORD  = 'password!!';
-    const API_USER_FIRSTNAME = 'user';
-    const API_USER_LASTNAME  = 'API';
-    const API_USER_EMAIL     = 'info@papertiger.com';
 
-    const API_BASE_URL       = 'https://media.services.pbs.org/api/v1/';
-    const API_AUTH_USERNAME  = 'user';
-    const API_AUTH_PASSWORD  = 'password';
     const API_COLUMN_FIELDS  = [
         // Special Fields
         [ 'thumbnail', '', 'Thumbnail', 'thumbnail', 'craft\fields\Assets' ],
@@ -43,19 +39,24 @@ abstract class ConstantAbstract
 
         // From PBS API Fields
         [ 'duration', '', 'Duration', 'duration', 'craft\fields\PlainText' ],
-        [ 'description_long', '', 'Description', 'description', 'craft\redactor\Field' ],
+        [ 'description_long', '', 'Description', 'description', self::DEFAULT_RICHTEXT_TYPE['fieldtype'] ],
         [ 'object_type', '', 'Media Type', 'mediaType', 'craft\fields\PlainText' ],
         [ 'player_code', '', 'Player Code', 'playerCode', 'craft\fields\PlainText' ],
     ];
     const SHOW_API_COLUMN_FIELDS = [
         // Special Fields
         [ 'show_images', '', 'Images', 'showImages', 'craft\fields\Assets' ],
+	      [ 'show_mezzanine', '', 'Mezzanine', 'showMezzanine', 'craft\fields\Assets' ],
+				[ 'show_poster', '', 'Poster', 'showPoster', 'craft\fields\Assets' ],
+	      [ 'show_white_logo', '', 'White Logo', 'showWhiteLogo', 'craft\fields\Assets' ],
+	      [ 'show_black_logo', '', 'Black Logo', 'showBlackLogo', 'craft\fields\Assets' ],
+	      [ 'show_color_logo', '', 'Color Logo', 'showColorLogo', 'craft\fields\Assets' ],
         [ 'show_last_synced', '', 'Last Synced', 'showLastSynced', 'craft\fields\Date' ],
         [ 'show_media_manager_id', '', 'Media Manager ID', 'showMediaManagerId', 'craft\fields\PlainText' ],
 
         // From PBS API Fields
-        [ 'description_short', '', 'Description Short', 'showDescriptionShort', 'craft\redactor\Field' ],
-        [ 'description_long', '', 'Description Long', 'showDescriptionLong', 'craft\redactor\Field' ],
+        [ 'description_short', '', 'Description Short', 'showDescriptionShort', self::DEFAULT_RICHTEXT_TYPE['fieldtype']],
+        [ 'description_long', '', 'Description Long', 'showDescriptionLong', self::DEFAULT_RICHTEXT_TYPE['fieldtype']],
     ];
 
     const REQUIRED_FIELDS  = [
@@ -97,7 +98,7 @@ abstract class ConstantAbstract
     const DEFAULT_FIELD_LAYOUT  = [
         'Content' => [ 'thumbnail', 'duration', 'description' ],
         'Tags' => [ 'siteTags', 'film', 'topic' ] ,
-        'API' => [ 'mediaManagerId', 'mediaType', 'playerCode', 'displayPassportIcon', 'expirationStatus', 'lastSynced', 'season', 'episode' ]
+        'API' => [ 'mediaManagerId', 'mediaType', 'playerCode', 'displayPassportIcon', 'expirationStatus', 'lastSynced', 'season', 'episode', 'markedForDeletion' ]
     ];
 
     const DEFAULT_SHOW_FIELD_LAYOUT  = [
@@ -105,9 +106,9 @@ abstract class ConstantAbstract
         'API' => [ 'showMediaManagerId', 'showLastSynced' ]
     ];
 
-    const REQUIRED_SETTINGS = [ 
+    const REQUIRED_SETTINGS = [
         'mediaSection', 'mediaAssetVolume', 'mediaFieldGroup',
-        'apiBaseUrl', 'apiAuthUsername', 'apiAuthPassword', 'apiColumnFields', 
+        'apiBaseUrl', 'apiColumnFields',
         'fieldLayout', 'syncSchedule'
     ];
 
@@ -116,13 +117,17 @@ abstract class ConstantAbstract
     const API_COLUMN_FIELD_NAME_INDEX     = 2;
     const API_COLUMN_FIELD_HANDLE_INDEX   = 3;
     const API_COLUMN_FIELD_TYPE_INDEX     = 4;
+    const API_COLUMN_FIELD_RULE_INDEX     = 5;
 
+		const DEFAULT_FIELD_GROUP = "Media Manager";
     const SYNC_SCHEDULE         = 'daily';
     const SYNC_CUSTOM_SCHEDULE  = '';
     const SYNC_PING_CHANGELOG   = 1;
 
     const MEDIAMANAGER_SHOW_TABLE_NAME         = 'mediamanager_show';
     const MEDIAMANAGER_SHOW_TABLE              = '{{%mediamanager_show}}';
+
+		const MEDIAMANAGER_SCHEDULED_SYNC_TABLE    = '{{%mediamanager_scheduled_syncs}}';
     const MEDIAMANAGER_OLD_SETTINGS_TABLE_NAME = 'mediamanager_old_settings';
     const MEDIAMANAGER_OLD_SETTINGS_TABLE      = '{{%mediamanager_old_settings}}';
 }

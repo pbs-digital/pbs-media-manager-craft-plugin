@@ -2,13 +2,12 @@
 /**
  * Media Manager
  *
- * @package       PaperTiger:MediaManager
- * @author        Paper Tiger
- * @copyright     Copyright (c) 2020 Paper Tiger
- * @link          https://www.papertiger.com/
+ * @package       Media Manager
+ * @author        PBS Digital
+ * @link          https://github.com/pbs-digital/pbs-media-manager-craft-plugin
  */
 
-namespace papertiger\mediamanager\controllers;
+namespace pbsdigital\mediamanager\controllers;
 
 use Craft;
 use craft\base\Element;
@@ -23,16 +22,16 @@ use yii\web\NotFoundHttpException;
 use yii\web\Response;
 use yii\web\ServerErrorHttpException;
 
-use papertiger\mediamanager\MediaManager;
+use pbsdigital\mediamanager\MediaManager;
 
 class SynchronizeController extends Controller
 {
     // Protected Properties
     // =========================================================================
-    
+
     protected const SYNCHRONIZE_TEMPLATE_PATH = 'mediamanager/synchronize';
     protected const CLEAN_TEMPLATE_PATH       = 'mediamanager/clean';
-    protected $allowAnonymous                 = [ 'index', 'all', 'single', 'synchronize' ];
+    protected array|int|bool $allowAnonymous                 = [ 'index', 'all', 'single', 'synchronize' ];
 
 
     // Public Methods
@@ -121,6 +120,7 @@ class SynchronizeController extends Controller
         $showId  = $request->getBodyParam( 'showId' );
         $siteId  = $request->getBodyParam( 'siteId' );
         $forceRegenerateThumbnail  = $request->getBodyParam( 'forceRegenerateThumbnail' );
+				$fieldsToSync = $request->getBodyParam('fieldsToSync');
 
         if( !$showId ) {
 
@@ -144,7 +144,7 @@ class SynchronizeController extends Controller
             ]);
         }
 
-        $synchronize = MediaManager::getInstance()->api->synchronizeShow( $show, $siteId, $forceRegenerateThumbnail );
+        $synchronize = MediaManager::getInstance()->api->synchronizeShow( $show, $forceRegenerateThumbnail, $fieldsToSync );
 
         return $this->asJson([
             'success' => true
@@ -158,6 +158,7 @@ class SynchronizeController extends Controller
         $apiKey  = $request->getBodyParam( 'apiKey' );
         $siteId  = $request->getBodyParam( 'siteId' );
         $forceRegenerateThumbnail = $request->getBodyParam( 'forceRegenerateThumbnail' );
+				$fieldsToSync = $request->getBodyParam('fieldsToSync');
 
         if( !$apiKey || !$siteId ) {
 
@@ -179,7 +180,7 @@ class SynchronizeController extends Controller
             }
         }
 
-        $synchronize = MediaManager::getInstance()->api->synchronizeSingle( $apiKey, $siteId, $forceRegenerateThumbnail );
+        $synchronize = MediaManager::getInstance()->api->synchronizeSingle( $apiKey, $siteId, $forceRegenerateThumbnail, $fieldsToSync );
 
         return $this->asJson([
             'success' => true
@@ -191,12 +192,13 @@ class SynchronizeController extends Controller
         $shows = MediaManager::getInstance()->show->getShow();
         $validatedShows = [];
         $request = Craft::$app->getRequest();
-        $forceRegenerateThumbnail  = $request->getQueryParam( 'forceRegenerateThumbnail' );
+	      $forceRegenerateThumbnail = $request->getBodyParam( 'forceRegenerateThumbnail' );
+				$fieldsToSync = $request->getBodyParam('fieldsToSync');
 
         foreach( $shows as $show ) {
-            
+
             if( $show->apiKey && $show->name ) {
-                
+
                 $show[ 'siteId' ] = json_decode( $show[ 'siteId' ] );
                 array_push( $validatedShows, $show );
             }
@@ -210,7 +212,7 @@ class SynchronizeController extends Controller
             ]);
         }
 
-        $synchronize = MediaManager::getInstance()->api->synchronizeAll( $validatedShows, $forceRegenerateThumbnail );
+        $synchronize = MediaManager::getInstance()->api->synchronizeAll( $validatedShows, $forceRegenerateThumbnail, $fieldsToSync );
 
         return $this->asJson([
             'success' => true
@@ -223,12 +225,11 @@ class SynchronizeController extends Controller
         $validatedShows = [];
         $request = Craft::$app->getRequest();
 
-        foreach( $shows as $show ) {
-            
-            if( $show->apiKey && $show->name ) {
-                
-                $show[ 'siteId' ] = json_decode( $show[ 'siteId' ] );
-                array_push( $validatedShows, $show );
+        $showsToSync = $request->getBodyParam('showsToSync', []);
+        foreach($shows as $show) {
+            if($show->apiKey && $show->name && (collect($showsToSync)->search($show->apiKey) !== false)) {
+                $show['siteId'] = json_decode($show['siteId']);
+                $validatedShows[] = $show;
             }
         }
 
@@ -240,7 +241,9 @@ class SynchronizeController extends Controller
             ]);
         }
 
-        $synchronize = MediaManager::getInstance()->api->synchronizeShowEntries( $validatedShows );
+
+        $fieldsToSync = $request->getBodyParam('fieldsToSync', []);
+        $synchronize = MediaManager::getInstance()->api->synchronizeShowEntries( $validatedShows, $fieldsToSync);
 
         return $this->asJson([
             'success' => true

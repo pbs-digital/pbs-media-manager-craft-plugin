@@ -2,26 +2,25 @@
 /**
  * Media Manager
  *
- * @package       PaperTiger:MediaManager
- * @author        Paper Tiger
- * @copyright     Copyright (c) 2020 Paper Tiger
- * @link          https://www.papertiger.com/
+ * @package       Media Manager
+ * @author        PBS Digital
+ * @link          https://github.com/pbs-digital/pbs-media-manager-craft-plugin
  */
 
-namespace papertiger\mediamanager\migrations;
+namespace pbsdigital\mediamanager\migrations;
 
 use Craft;
 use craft\db\Migration;
 use craft\config\DbConfig;
 
-use papertiger\mediamanager\MediaManager;
-use papertiger\mediamanager\base\ConstantAbstract;
+use pbsdigital\mediamanager\MediaManager;
+use pbsdigital\mediamanager\base\ConstantAbstract;
 
 class Install extends Migration
 {
     // Private Properties
     // =========================================================================
-    
+
     private $mediaManagerShowTable        = ConstantAbstract::MEDIAMANAGER_SHOW_TABLE;
     private $mediaManagerOldSettingsTable = ConstantAbstract::MEDIAMANAGER_OLD_SETTINGS_TABLE;
 
@@ -69,7 +68,7 @@ class Install extends Migration
         $tableSchema = Craft::$app->db->schema->getTableSchema( $this->mediaManagerShowTable );
 
         if( $tableSchema === null ) {
-            
+
             $this->createTable(
                 $this->mediaManagerShowTable,
                 [
@@ -102,7 +101,7 @@ class Install extends Migration
         $tableSchema = Craft::$app->db->schema->getTableSchema( $this->mediaManagerOldSettingsTable );
 
         if( $tableSchema === null ) {
-            
+
             $this->createTable(
                 $this->mediaManagerOldSettingsTable,
                 [

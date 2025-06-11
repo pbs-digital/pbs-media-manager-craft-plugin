@@ -2,19 +2,19 @@
 /**
  * Media Manager
  *
- * @package       PaperTiger:MediaManager
- * @author        Paper Tiger
- * @copyright     Copyright (c) 2020 Paper Tiger
- * @link          https://www.papertiger.com/
+ * @package       Media Manager
+ * @author        PBS Digital
+ * @link          https://github.com/pbs-digital/pbs-media-manager-craft-plugin
  */
 
-namespace papertiger\mediamanager\helpers;
+namespace pbsdigital\mediamanager\helpers;
 
 use Craft;
+use craft\elements\User;
 use yii\base\Application;
 
-use papertiger\mediamanager\MediaManager;
-use papertiger\mediamanager\base\ConstantAbstract;
+use pbsdigital\mediamanager\MediaManager;
+use pbsdigital\mediamanager\base\ConstantAbstract;
 
 class SettingsHelper
 {
@@ -44,6 +44,7 @@ class SettingsHelper
         return [
             'plugin'        => MediaManager::$plugin,
             'settings'      => self::settings(),
+            'users'         => User::find()->all(),
             'isCraft35'     => $isCraft35
         ];
     }

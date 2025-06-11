@@ -2,22 +2,21 @@
 /**
  * Media Manager
  *
- * @package       PaperTiger:MediaManager
- * @author        Paper Tiger
- * @copyright     Copyright (c) 2020 Paper Tiger
- * @link          https://www.papertiger.com/
+ * @package       Media Manager
+ * @author        PBS Digital
+ * @link          https://github.com/pbs-digital/pbs-media-manager-craft-plugin
  */
 
-namespace papertiger\mediamanager\helpers\aftersavesettings;
+namespace pbsdigital\mediamanager\helpers\aftersavesettings;
 
 use Craft;
 use yii\base\Application;
 use craft\elements\Entry;
 use craft\models\FieldLayoutTab;
 
-use papertiger\mediamanager\MediaManager;
-use papertiger\mediamanager\base\ConstantAbstract;
-use papertiger\mediamanager\helpers\SettingsHelper;
+use pbsdigital\mediamanager\MediaManager;
+use pbsdigital\mediamanager\base\ConstantAbstract;
+use pbsdigital\mediamanager\helpers\SettingsHelper;
 
 class FieldLayoutHelper
 {
@@ -25,7 +24,7 @@ class FieldLayoutHelper
     // =========================================================================
 
     public static function process()
-    {   
+    {
         // Process Field Layout
         $mediaSectionHandle = SettingsHelper::get( 'mediaSection' );
         $mediaSection       = Craft::$app->getSections()->getSectionByHandle( $mediaSectionHandle );
@@ -45,7 +44,7 @@ class FieldLayoutHelper
 
     // Private Static Methods
     // =========================================================================
-    
+
     private static function _registerTabAndFields( $fields )
     {
         $layoutTabs   = [];
@@ -53,7 +52,7 @@ class FieldLayoutHelper
         $sortOrder    = 0;
 
         foreach( $fields as $key => $fieldItems ) {
-            
+
             $tab            = new FieldLayoutTab();
             $tab->name      = $key;
             $tab->sortOrder = $sortOrder + 1;

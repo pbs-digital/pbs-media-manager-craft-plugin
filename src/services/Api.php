@@ -2,15 +2,15 @@
 /**
  * Media Manager
  *
- * @package       PaperTiger:MediaManager
- * @author        Paper Tiger
- * @copyright     Copyright (c) 2020 Paper Tiger
- * @link          https://www.papertiger.com/
+ * @package       Media Manager
+ * @author        PBS Digital
+ * @link          https://github.com/pbs-digital/pbs-media-manager-craft-plugin
  */
 
-namespace papertiger\mediamanager\services;
+namespace pbsdigital\mediamanager\services;
 
 use Craft;
+use craft\helpers\App;
 use craft\base\Component;
 use craft\base\Element;
 use craft\helpers\UrlHelper;
@@ -19,22 +19,22 @@ use craft\elements\db\ElementQuery;
 use GuzzleHttp\Exception\RequestException;
 use yii\base\Exception;
 
-use papertiger\mediamanager\MediaManager;
-use papertiger\mediamanager\jobs\MediaSync;
-use papertiger\mediamanager\jobs\MediaClean;
-use papertiger\mediamanager\jobs\ShowEntriesSync;
-use papertiger\mediamanager\helpers\SettingsHelper;
-use papertiger\mediamanager\helpers\SynchronizeHelper;
+use pbsdigital\mediamanager\MediaManager;
+use pbsdigital\mediamanager\jobs\MediaSync;
+use pbsdigital\mediamanager\jobs\MediaClean;
+use pbsdigital\mediamanager\jobs\ShowEntriesSync;
+use pbsdigital\mediamanager\helpers\SettingsHelper;
+use pbsdigital\mediamanager\helpers\SynchronizeHelper;
 
 class Api extends Component
 {
     // Private Properties
     // =========================================================================
-    
-    protected static $sectionMediaHandle;
-    protected static $sectionUsedMediaHandle;
-    protected static $apiBaseUrl;
-    protected static $apiAuth;
+
+    protected static string $sectionMediaHandle;
+    protected static string $sectionUsedMediaHandle;
+    protected static string $apiBaseUrl;
+    protected static array $apiAuth;
 
 
     // Public Methods
@@ -45,11 +45,26 @@ class Api extends Component
         self::$sectionMediaHandle     = SettingsHelper::get( 'mediaSection' );
         self::$sectionUsedMediaHandle = SettingsHelper::get( 'mediaUsedBySection' );
 
+        $pbsApiUsername = '';
+        $pbsApiPassword = '';
+
+        if( method_exists( 'Craft', 'parseEnv' ) ) {
+
+            $pbsApiUsername = Craft::parseEnv( '$PBS_API_BASIC_AUTH_USERNAME' );
+            $pbsApiPassword = Craft::parseEnv( '$PBS_API_BASIC_AUTH_PASSWORD' );
+        }
+
+        if( method_exists( 'App', 'parseEnv' ) ) {
+
+            $pbsApiUsername = App::parseEnv( '$PBS_API_BASIC_AUTH_USERNAME' );
+            $pbsApiPassword = App::parseEnv( '$PBS_API_BASIC_AUTH_PASSWORD' );
+        }
+
         self::$apiBaseUrl = SettingsHelper::get( 'apiBaseUrl' );
         self::$apiAuth    = [
             'auth' => [
-                SettingsHelper::get( 'apiAuthUsername' ),
-                SettingsHelper::get( 'apiAuthPassword' ),
+                $pbsApiUsername,
+                $pbsApiPassword,
             ]
         ];
     }
@@ -84,19 +99,19 @@ class Api extends Component
         return false;
     }
 
-    public function synchronizeShow( $show, $siteId, $forceRegenerateThumbnail )
+    public function synchronizeShow( $show, $forceRegenerateThumbnail, $fieldsToSync ): bool
     {
 
         if( !$show->apiKey ) {
             return false;
         }
 
-        $this->runSynchronizeShow( $show, $forceRegenerateThumbnail );
+        $this->runSynchronizeShow( $show, $forceRegenerateThumbnail, $fieldsToSync );
 
         return true;
     }
 
-    public function synchronizeSingle( $apiKey, $siteId, $forceRegenerateThumbnail )
+    public function synchronizeSingle( $apiKey, $siteId, $forceRegenerateThumbnail, $fieldsToSync = '*' )
     {
 
         if( !$apiKey || !$siteId ) {
@@ -109,35 +124,37 @@ class Api extends Component
             'singleAssetKey' => $apiKey,
             'title'          => 'Single media asset',
             'auth'           => self::$apiAuth,
-            'forceRegenerateThumbnail' => $forceRegenerateThumbnail
+            'forceRegenerateThumbnail' => $forceRegenerateThumbnail,
+	          'fieldsToSync' => $fieldsToSync
         ]));
 
         return true;
     }
 
-    public function synchronizeAll( $shows, $forceRegenerateThumbnail )
+    public function synchronizeAll( $shows, $forceRegenerateThumbnail, $fieldsToSync = '*' )
     {
         foreach( $shows as $show ) {
-            
+
             if( $show->apiKey ) {
-                $this->runSynchronizeShow( $show, $forceRegenerateThumbnail );
+                $this->runSynchronizeShow( $show, $forceRegenerateThumbnail, $fieldsToSync );
             }
         }
 
         return true;
     }
 
-    public function synchronizeShowEntries( $shows )
+    public function synchronizeShowEntries( $shows, $fieldsToSync = '*' )
     {
         foreach( $shows as $show ) {
-            
+
             if( $show->apiKey ) {
 
                 Craft::$app->queue->push( new ShowEntriesSync([
 
                     'apiKey'      => $show->apiKey,
                     'title'       => $show->name . ' (Show)',
-                    'auth'        => self::$apiAuth
+                    'auth'        => self::$apiAuth,
+                    'fieldsToSync' => $fieldsToSync,
                 ]));
             }
         }
@@ -145,11 +162,21 @@ class Api extends Component
         return true;
     }
 
+		public function getApiBaseUrl()
+		{
+			return self::$apiBaseUrl;
+		}
+
+		public function getApiAuth()
+		{
+			return self::$apiAuth;
+		}
+
     public function runClean()
     {
 
         try {
-            
+
             // Check used media entries from pages
             $usedMedia = [];
             $sites = Craft::$app->sites->getAllSites();
@@ -166,7 +193,7 @@ class Api extends Component
                 foreach( $pages as $page ) {
 
                     foreach( $page[ 'pageBuilder' ]->all() as $parentBlock ) {
-                        
+
                         foreach( $parentBlock[ 'row' ]->all() as $component ) {
 
                             switch( $component[ 'type' ] ) {
@@ -184,7 +211,7 @@ class Api extends Component
                                     }
 
                                     foreach( $component[ 'selectedMedia' ]->anyStatus()->all() as $entry ) {
-                                        
+
                                         array_push( $usedMedia, [
                                             'id' => $entry[ 'id' ],
                                             'title' => $entry[ 'title' ],
@@ -223,9 +250,9 @@ class Api extends Component
             foreach( $entries as $entry ) {
 
                 $mediaManagerId = $entry[ 'mediaManagerId' ];
-                
+
                 if( array_key_exists( $mediaManagerId, $duplicateCounter ) ) {
-                    $duplicateCounter[ $mediaManagerId ]++; 
+                    $duplicateCounter[ $mediaManagerId ]++;
                 } else {
                     $duplicateCounter[ $mediaManagerId ] = 1;
                 }
@@ -292,7 +319,7 @@ class Api extends Component
             }
 
             return $total;
-            
+
 
         } catch( Exception $e ) {
             return false;
@@ -301,8 +328,8 @@ class Api extends Component
 
     // Private Methods
     // =========================================================================
-     
-    private function runSynchronizeShow( $show, $forceRegenerateThumbnail ) 
+
+    private function runSynchronizeShow( $show, $forceRegenerateThumbnail, $fieldsToSync = '*' )
     {
         Craft::$app->queue->push( new MediaSync([
 
@@ -312,14 +339,13 @@ class Api extends Component
             'apiKey'      => $show->apiKey,
             'title'       => $show->name . ' (Show)',
             'auth'        => self::$apiAuth,
-            'forceRegenerateThumbnail' => $forceRegenerateThumbnail
+            'forceRegenerateThumbnail' => $forceRegenerateThumbnail,
+	          'fieldsToSync' => $fieldsToSync
         ]));
 
         $seasons = $this->getSeasonsOfShow( $show->apiKey );
 
         foreach( $seasons->data as $season ) {
-
-            sleep( 3 );
 
             Craft::$app->queue->push( new MediaSync([
 
@@ -329,14 +355,13 @@ class Api extends Component
                 'apiKey'      => $season->id,
                 'title'       => $show->name . ' (Season ' . $season->attributes->ordinal . ')',
                 'auth'        => self::$apiAuth,
-                'forceRegenerateThumbnail' => $forceRegenerateThumbnail
+                'forceRegenerateThumbnail' => $forceRegenerateThumbnail,
+	              'fieldsToSync' => $fieldsToSync
             ]));
 
             $episodes = $this->getEpisodesOfShow( $season->id );
 
             foreach( $episodes->data as $episode ) {
-
-                sleep( 3 );
 
                 Craft::$app->queue->push( new MediaSync([
 
@@ -346,7 +371,8 @@ class Api extends Component
                     'apiKey'      => $episode->id,
                     'title'       => $episode->attributes->title . ' (Episode)',
                     'auth'        => self::$apiAuth,
-                    'forceRegenerateThumbnail' => $forceRegenerateThumbnail
+                    'forceRegenerateThumbnail' => $forceRegenerateThumbnail,
+	                  'fieldsToSync' => $fieldsToSync
                 ]));
             }
         }
@@ -354,8 +380,6 @@ class Api extends Component
         $specials = $this->getSpecialsOfShow( $show->apiKey );
 
         foreach( $specials->data as $special ) {
-
-            sleep( 3 );
 
             Craft::$app->queue->push( new MediaSync([
 
@@ -365,7 +389,8 @@ class Api extends Component
                 'apiKey'      => $special->id,
                 'title'       => $special->attributes->title . ' (Special)',
                 'auth'        => self::$apiAuth,
-                'forceRegenerateThumbnail' => $forceRegenerateThumbnail
+                'forceRegenerateThumbnail' => $forceRegenerateThumbnail,
+	              'fieldsToSync' => $fieldsToSync
             ]));
         }
     }

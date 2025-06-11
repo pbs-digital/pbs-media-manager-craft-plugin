@@ -2,13 +2,12 @@
 /**
  * Media Manager
  *
- * @package       PaperTiger:MediaManager
- * @author        Paper Tiger
- * @copyright     Copyright (c) 2020 Paper Tiger
- * @link          https://www.papertiger.com/
+ * @package       Media Manager
+ * @author        PBS Digital
+ * @link          https://github.com/pbs-digital/pbs-media-manager-craft-plugin
  */
 
-namespace papertiger\mediamanager\controllers;
+namespace pbsdigital\mediamanager\controllers;
 
 use Craft;
 use craft\base\Element;
@@ -22,19 +21,19 @@ use yii\web\NotFoundHttpException;
 use yii\web\Response;
 use yii\web\ServerErrorHttpException;
 
-use papertiger\mediamanager\MediaManager;
+use pbsdigital\mediamanager\MediaManager;
 
 class ShowController extends Controller
 {
     // Protected Properties
     // =========================================================================
     protected const SHOW_TEMPLATE_PATH = 'mediamanager/show';
-    protected $allowAnonymous          = [ 'index', 'show', 'pbs' ];
+    protected array|int|bool $allowAnonymous          = [ 'index', 'show', 'pbs' ];
 
 
     // Public Methods
     // =========================================================================
-    
+
     public function actionIndex( $entryId = null )
     {
 
@@ -54,7 +53,7 @@ class ShowController extends Controller
         );
     }
 
-    public function actionSave()
+    public function actionSave(): ?Response
     {
         $request = Craft::$app->getRequest();
         $name    = $request->getBodyParam( 'name' );
@@ -65,7 +64,7 @@ class ShowController extends Controller
 
         if( !$name ) {
 
-            return $this->asJson([
+            return $this->asFailure('Show name is required', [
                 'success' => false,
                 'errors' => [ 'Show name is required' ],
             ]);
@@ -76,7 +75,7 @@ class ShowController extends Controller
 
             if( !MediaManager::getInstance()->api->validateApiKey( $apiKey, 'show' ) ) {
 
-                return $this->asJson([
+                return $this->asFailure('Invalid API Key', [
                     'success' => false,
                     'errors' => [ 'Invalid API Key' ],
                 ]);
@@ -87,13 +86,13 @@ class ShowController extends Controller
 
         if( $show->getErrors() ) {
 
-            return $this->asJson([
+            return $this->asFailure('Unable to save show.', [
                 'success' => false,
                 'errors' => $show->getErrors(),
             ]);
         }
 
-        return $this->asJson([
+        return $this->asSuccess('Show saved.', [
             'success' => true,
             'show' => [
                 'id' => $show->id,

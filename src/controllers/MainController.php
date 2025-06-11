@@ -2,19 +2,20 @@
 /**
  * Media Manager
  *
- * @package       PaperTiger:MediaManager
- * @author        Paper Tiger
- * @copyright     Copyright (c) 2020 Paper Tiger
- * @link          https://www.papertiger.com/
+ * @package       Media Manager
+ * @author        PBS Digital
+ * @link          https://github.com/pbs-digital/pbs-media-manager-craft-plugin
  */
 
-namespace papertiger\mediamanager\controllers;
+namespace pbsdigital\mediamanager\controllers;
 
 use Craft;
 use craft\base\Element;
+use craft\helpers\Queue;
 use craft\helpers\UrlHelper;
 use craft\elements\Entry;
 use craft\web\Controller;
+use pbsdigital\mediamanager\jobs\CancelStaleMedia;
 use yii\base\Exception;
 use yii\base\InvalidConfigException;
 use yii\web\ForbiddenHttpException;
@@ -22,7 +23,7 @@ use yii\web\NotFoundHttpException;
 use yii\web\Response;
 use yii\web\ServerErrorHttpException;
 
-use papertiger\mediamanager\MediaManager;
+use pbsdigital\mediamanager\MediaManager;
 
 class MainController extends Controller
 {
@@ -31,18 +32,26 @@ class MainController extends Controller
     // =========================================================================
     protected const INDEX_TEMPLATE_PATH          = 'mediamanager/index';
     protected const ENTRIES_TEMPLATE_PATH        = 'mediamanager/entries';
-    protected $allowAnonymous                    = [ 'index', 'entries' ];
+    protected array|int|bool $allowAnonymous                    = [ 'index', 'entries' ];
 
     // Public Methods
     // =========================================================================
 
-    public function actionIndex()
+    public function actionIndex(): Response
     {
         return $this->renderTemplate( self::INDEX_TEMPLATE_PATH );
     }
 
-    public function actionEntries()
+    public function actionEntries(): Response
     {
         return $this->renderTemplate( self::ENTRIES_TEMPLATE_PATH );
+    }
+
+    public function actionCancelMarkedForDeletion(): Response
+    {
+        $this->requireLogin();
+        Queue::push((new CancelStaleMedia()));
+
+        return $this->asJson('Unchecking items marked for deletion.');
     }
 }

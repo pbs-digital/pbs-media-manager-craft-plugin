@@ -2,27 +2,27 @@
 /**
  * Media Manager
  *
- * @package       PaperTiger:MediaManager
- * @author        Paper Tiger
- * @copyright     Copyright (c) 2020 Paper Tiger
- * @link          https://www.papertiger.com/
+ * @package       Media Manager
+ * @author        PBS Digital
+ * @link          https://github.com/pbs-digital/pbs-media-manager-craft-plugin
  */
 
-namespace papertiger\mediamanager\helpers;
+namespace pbsdigital\mediamanager\helpers;
 
 use Craft;
 use Exception;
 
-use papertiger\mediamanager\base\ConstantAbstract;
+use pbsdigital\mediamanager\base\ConstantAbstract;
+use pbsdigital\mediamanager\MediaManager;
 
 class DependencyHelper
 {
     // Public Static Methods
     // =========================================================================
-    
+
     public static function installDependencies()
-    {   
-        self::_installCraftRedactorPlugin();
+    {
+        self::_installCraftRichtextPlugin();
     }
 
 
@@ -59,16 +59,27 @@ class DependencyHelper
         return false;
     }
 
-    private static function _installCraftRedactorPlugin()
+    private static function _installCraftRichtextPlugin(): void
     {
-        $pluginHandle = ConstantAbstract::DEPENDENCY_PLUGIN_CRAFT_REDACTOR_HANDLE;
+        $allowableRichtextPlugins = ConstantAbstract::DEPENDENCY_PLUGIN_CRAFT_RICHTEXT_PLUGINS;
 
-        if( !self::checkPluginExists( $pluginHandle ) ) {
-            Craft::$app->getComposer()->install( [ ConstantAbstract::DEPENDENCY_PLUGIN_CRAFT_REDACTOR_PACKAGE => ConstantAbstract::DEPENDENCY_PLUGIN_CRAFT_REDACTOR_VERSION ] );
+        $hasAllowablePluginInstalled = collect($allowableRichtextPlugins)->first(function($plugin, $key){
+                return self::checkPluginExists($plugin['handle']);
+        });
+
+        if($hasAllowablePluginInstalled) {
+            $plugin = MediaManager::getInstance();
+            $plugin->settings->defaultRichtextField = $hasAllowablePluginInstalled;
+
+            return;
         }
 
+        $defaultPlugin = ConstantAbstract::DEFAULT_RICHTEXT_TYPE;
+        $pluginHandle = $defaultPlugin['handle'];
+	      Craft::$app->getComposer()->install( [ $defaultPlugin['handle'] => $defaultPlugin['version'] ] );
+
         if( self::checkPluginDisabled( $pluginHandle ) && Craft::$app->getPlugins()->getStoredPluginInfo( $pluginHandle ) ) {
-            
+
             Craft::$app->getPlugins()->enablePlugin( $pluginHandle ); // Need to recheck this one
             return;
         }

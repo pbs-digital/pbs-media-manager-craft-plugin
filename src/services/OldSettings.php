@@ -2,19 +2,18 @@
 /**
  * Media Manager
  *
- * @package       PaperTiger:MediaManager
- * @author        Paper Tiger
- * @copyright     Copyright (c) 2020 Paper Tiger
- * @link          https://www.papertiger.com/
+ * @package       Media Manager
+ * @author        PBS Digital
+ * @link          https://github.com/pbs-digital/pbs-media-manager-craft-plugin
  */
 
-namespace papertiger\mediamanager\services;
+namespace pbsdigital\mediamanager\services;
 
 use Craft;
 use craft\base\Component;
 
-use papertiger\mediamanager\MediaManager;
-use papertiger\mediamanager\records\OldSettings as OldSettingsRecord;
+use pbsdigital\mediamanager\MediaManager;
+use pbsdigital\mediamanager\records\OldSettings as OldSettingsRecord;
 
 class OldSettings extends Component
 {
@@ -60,7 +59,7 @@ class OldSettings extends Component
             if( $settingValue ) {
                 $existingOldSetting->settingValue = $settingValue;
             }
-            
+
             $existingOldSetting->update();
 
             return $existingOldSetting;

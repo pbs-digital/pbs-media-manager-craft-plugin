@@ -2,13 +2,12 @@
 /**
  * Media Manager
  *
- * @package       PaperTiger:MediaManager
- * @author        Paper Tiger
- * @copyright     Copyright (c) 2020 Paper Tiger
- * @link          https://www.papertiger.com/
+ * @package       Media Manager
+ * @author        PBS Digital
+ * @link          https://github.com/pbs-digital/pbs-media-manager-craft-plugin
  */
 
-namespace papertiger\mediamanager\assetbundles\showcpsection;
+namespace pbsdigital\mediamanager\assetbundles\showcpsection;
 
 use Craft;
 use craft\web\AssetBundle;
@@ -21,7 +20,7 @@ class ShowCPSectionAsset extends AssetBundle
 
     public function init()
     {
-        $this->sourcePath = '@papertiger/mediamanager/assetbundles/showcpsection/dist';
+        $this->sourcePath = '@pbsdigital/mediamanager/assetbundles/showcpsection/dist';
         $this->depends    = [ CpAsset::class ];
         $this->js         = [ 'js/Show.js' ];
         $this->css        = [ 'css/Show.css' ];

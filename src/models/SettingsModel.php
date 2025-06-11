@@ -2,22 +2,21 @@
 /**
  * Media Manager
  *
- * @package       PaperTiger:MediaManager
- * @author        Paper Tiger
- * @copyright     Copyright (c) 2020 Paper Tiger
- * @link          https://www.papertiger.com/
+ * @package       Media Manager
+ * @author        PBS Digital
+ * @link          https://github.com/pbs-digital/pbs-media-manager-craft-plugin
  */
 
-namespace papertiger\mediamanager\models;
+namespace pbsdigital\mediamanager\models;
 
 use Craft;
 use craft\base\Model;
 
-use papertiger\mediamanager\base\ConstantAbstract;
-use papertiger\mediamanager\validators\BasicAuthValidator;
-use papertiger\mediamanager\validators\CronExpressionValidator;
-use papertiger\mediamanager\validators\ApiColumnFieldsValidator;
-use papertiger\mediamanager\validators\ShowApiColumnFieldsValidator;
+use pbsdigital\mediamanager\base\ConstantAbstract;
+use pbsdigital\mediamanager\validators\BasicAuthValidator;
+use pbsdigital\mediamanager\validators\CronExpressionValidator;
+use pbsdigital\mediamanager\validators\ApiColumnFieldsValidator;
+use pbsdigital\mediamanager\validators\ShowApiColumnFieldsValidator;
 
 class SettingsModel extends Model
 {
@@ -30,9 +29,17 @@ class SettingsModel extends Model
     public $mediaFieldGroup;
     public $showSection;
 
-    public $apiBaseUrl          = ConstantAbstract::API_BASE_URL;
-    public $apiAuthUsername     = ConstantAbstract::API_AUTH_USERNAME;
-    public $apiAuthPassword     = ConstantAbstract::API_AUTH_PASSWORD;
+    public $blogTagsSection;
+    public $dateTagsSection;
+    public $filmTagsSection;
+    public $siteTagsSection;
+    public $themeTagsSection;
+    public $topicTagsSection;
+    // public $assetTypeTagsSection;
+
+    public $apiCraftUser        = '';
+    public $apiBaseUrl          = '';
+
     public $apiColumnFields     = ConstantAbstract::API_COLUMN_FIELDS;
     public $showApiColumnFields = ConstantAbstract::SHOW_API_COLUMN_FIELDS;
 
@@ -42,20 +49,24 @@ class SettingsModel extends Model
     public $syncSchedule        = ConstantAbstract::SYNC_SCHEDULE;
     public $syncCustomSchedule  = ConstantAbstract::SYNC_CUSTOM_SCHEDULE;
     public $syncPingChangelog   = ConstantAbstract::SYNC_PING_CHANGELOG;
-
+    public $defaultRichtextField = ConstantAbstract::DEFAULT_RICHTEXT_TYPE;
 
     // Public Methods
     // =========================================================================
 
-    public function rules()
+    public function rules(): array
     {
         return [
             [
-                ConstantAbstract::REQUIRED_SETTINGS, 
-                'required' 
+                ConstantAbstract::REQUIRED_SETTINGS,
+                'required'
             ],
             [
-                [ 'apiBaseUrl', 'apiAuthUsername', 'apiAuthPassword' ],
+                [ 'apiCraftUser' ],
+                'required'
+            ],
+            [
+                [ 'apiBaseUrl' ],
                 BasicAuthValidator::class
             ],
             [

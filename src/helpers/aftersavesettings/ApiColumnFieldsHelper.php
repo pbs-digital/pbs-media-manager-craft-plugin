@@ -2,13 +2,12 @@
 /**
  * Media Manager
  *
- * @package       PaperTiger:MediaManager
- * @author        Paper Tiger
- * @copyright     Copyright (c) 2020 Paper Tiger
- * @link          https://www.papertiger.com/
+ * @package       Media Manager
+ * @author        PBS Digital
+ * @link          https://github.com/pbs-digital/pbs-media-manager-craft-plugin
  */
 
-namespace papertiger\mediamanager\helpers\aftersavesettings;
+namespace pbsdigital\mediamanager\helpers\aftersavesettings;
 
 use Craft;
 use yii\base\Application;
@@ -19,12 +18,13 @@ use craft\fields\Date;
 use craft\fields\Lightswitch;
 use craft\fields\PlainText;
 use craft\fields\Tags;
+use craft\fields\Url;
 use craft\redactor\Field as Redactor;
 use craft\helpers\ElementHelper;
 
-use papertiger\mediamanager\MediaManager;
-use papertiger\mediamanager\base\ConstantAbstract;
-use papertiger\mediamanager\helpers\SettingsHelper;
+use pbsdigital\mediamanager\MediaManager;
+use pbsdigital\mediamanager\base\ConstantAbstract;
+use pbsdigital\mediamanager\helpers\SettingsHelper;
 
 class ApiColumnFieldsHelper
 {
@@ -32,17 +32,17 @@ class ApiColumnFieldsHelper
     // =========================================================================
 
     public static function process()
-    {   
+    {
         // Process API Column & Fields
         $settingName = 'apiColumnFields';
         $oldSetting  = MediaManager::getInstance()->oldsettings->get( $settingName );
         $oldValue    = [];
         $newValue    = SettingsHelper::get( $settingName );
-        
+
         if( $oldSetting && $oldSetting->settingValue ) {
             $oldValue = $oldSetting->settingValue;
         }
-        
+
         // Compare hash on both new and old settings
         $oldHash = md5( json_encode( $oldValue ) );
         $newHash = md5( json_encode( $newValue ) );
@@ -54,13 +54,13 @@ class ApiColumnFieldsHelper
             $tempUpdatedFields = [];
 
             foreach( $newValue as $newField ) {
-                
+
                 $fieldApi      = $newField[ ConstantAbstract::API_COLUMN_FIELD_API_INDEX ];
                 $existingField = $newField[ ConstantAbstract::API_COLUMN_EXISTING_FIELD_INDEX ];
                 $fieldName     = $newField[ ConstantAbstract::API_COLUMN_FIELD_NAME_INDEX ];
                 $fieldHandle   = $newField[ ConstantAbstract::API_COLUMN_FIELD_HANDLE_INDEX ];
-                $fieldType     = $newField[ ConstantAbstract::API_COLUMN_FIELD_TYPE_INDEX ]; 
-                
+                $fieldType     = $newField[ ConstantAbstract::API_COLUMN_FIELD_TYPE_INDEX ];
+
                 $oldSetting = self::getColumnByHandle( $oldValue, $fieldHandle );
 
                 // If using existing field, no need to touch it any further
@@ -70,7 +70,7 @@ class ApiColumnFieldsHelper
                     if( !$oldSetting ) {
                         $tempNewFields[] = $newField;
                     } else {
-                        
+
                         // Check if there's field being updated
                         if( $fieldName != $oldSetting[ ConstantAbstract::API_COLUMN_FIELD_NAME_INDEX ] || $fieldType != $oldSetting[ ConstantAbstract::API_COLUMN_FIELD_TYPE_INDEX ] ) {
                             $tempUpdatedFields[] = $newField;
@@ -117,7 +117,7 @@ class ApiColumnFieldsHelper
     }
 
     private static function createCraftField( $field )
-    {   
+    {
         // Only create if not exists
         if( !self::findCraftFieldByHandle( $field ) ) {
 
@@ -136,7 +136,9 @@ class ApiColumnFieldsHelper
 
             $fieldInformation = self::craftFieldInformation( $field );
             $fieldInformation[ 'id' ] = $existingField->id;
-
+            if(!isset($existingField->type)) {
+                $fieldInformation['type'] = end($field);
+            }
             $field = Craft::$app->getFields()->createField( $fieldInformation );
             Craft::$app->getFields()->saveField( $field );
         }
@@ -182,7 +184,12 @@ class ApiColumnFieldsHelper
             break;
 
             case 'craft\fields\PlainText':
-                $fieldInformation[ 'type' ]       = PlainText::class;
+                $fieldInformation[ 'type' ]  = PlainText::class;
+            break;
+
+            case 'craft\fields\Url':
+                $fieldInformation[ 'type' ]  = Url::class;
+                $fieldInformation[ 'types' ] = [ 'url' ];
             break;
 
             case 'craft\redactor\Field':
@@ -196,7 +203,7 @@ class ApiColumnFieldsHelper
                 if( method_exists( 'ElementHelper', 'generateSlug' ) ) {
                     $tagGroupHandle = ElementHelper::generateSlug( $field[ ConstantAbstract::API_COLUMN_FIELD_NAME_INDEX ] );
                 } else {
-                    $tagGroupHandle = ElementHelper::createSlug( $field[ ConstantAbstract::API_COLUMN_FIELD_NAME_INDEX ] );
+                    $tagGroupHandle = ElementHelper::normalizeSlug( $field[ ConstantAbstract::API_COLUMN_FIELD_NAME_INDEX ] );
                 }
 
                 // Find tag group first
@@ -213,6 +220,15 @@ class ApiColumnFieldsHelper
                     $group->setFieldLayout( $fieldLayout );
 
                     Craft::$app->getTags()->saveTagGroup( $group );
+
+                    try {
+                        $fieldLayout = Craft::$app->getFields()->assembleLayoutFromPost();
+                        $fieldLayout->type = Tag::class;
+                        $group->setFieldLayout( $fieldLayout );
+                        Craft::$app->getTags()->saveTagGroup( $group );
+                    } catch( \Throwable $e ) {
+                        Craft::error( $e->getMessage(), __METHOD__ );
+                    }
 
                     $tagGroupUid = $group->uid;
 

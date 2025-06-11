@@ -12,7 +12,22 @@
 
 {% endfor %}
 
+{% set allusers   = [ { label: '— Select Craft User —', value: '' } ] %}
+{% for user in users %}
+    {% set allusers = allusers | merge([{ label: user.username, value: user.username }]) %}
+{% endfor %}
+
 <div id="tab-api-column-fields" class="hidden">
+    {{ forms.selectField({
+        required: true,
+        name: 'apiCraftUser',
+        label: 'Craft User for API',
+        instructions: 'This Craft user will be used when the API populating entries in Craft.',
+        value: settings.apiCraftUser,
+        options: allusers,
+        errors: settings.getErrors( 'apiCraftUser' )
+    }) }}
+
     {{ forms.textField({
         required: true,
         name: 'apiBaseUrl',
@@ -21,26 +36,6 @@
         value: settings.apiBaseUrl,
         errors: settings.getErrors( 'apiBaseUrl' )
     }) }}
-
-    <div class="flex">
-        {{ forms.textField({
-            required: true,
-            name: 'apiAuthUsername',
-            label: 'Basic Auth',
-            instructions: 'Username',
-            fieldClass: 'flex-grow',
-            value: settings.apiAuthUsername,
-            errors: settings.getErrors( 'apiAuthUsername' )
-        }) }}
-        {{ forms.textField({
-            name: 'apiAuthPassword',
-            label: '&nbsp;',
-            instructions: 'Password',
-            fieldClass: 'flex-grow',
-            value: settings.apiAuthPassword,
-            errors: settings.getErrors( 'apiAuthPassword' )
-        }) }}
-    </div>
 
     <hr/>
 
@@ -53,54 +48,98 @@
         addRowLabel: 'Add a field',
         rows: settings.apiColumnFields,
         errors: settings.getErrors( 'apiColumnFields' ),
+        allowAdd: true,
+        allowReorder: true,
+        allowDelete: true,
         cols: [
-            { 
-                heading: 'API Field', 
+            {
+                heading: 'API Field',
                 handle: 'apiField',
                 width: '20%',
                 type: 'select',
                 options: [
                     {"label":"— Select Field —"},
                     {"optgroup":"Special Field","label":"Special Field"},
-                        {"value":"thumbnail","label":"Thumbnail"},{"value":"display_passport_icon","label":"Display Passport Icon?"},{"value":"last_synced","label":"Last Synced"},{"value":"site_tags","label":"Site Tags"},{"value":"film_tags","label":"Film Tags"},{"value":"topic_tags","label":"Topic Tags"},{"value":"expiration_status","label":"Expiration Status"},{"value":"media_manager_id","label":"Media Manager ID"},
-                        {"value":"season","label":"Season"},{"value":"episode","label":"Episode"},
+                        {"value":"thumbnail","label":"Thumbnail"},
+                        {"value":"display_passport_icon","label":"Display Passport Icon?"},
+                        {"value":"last_synced","label":"Last Synced"},
+                        {"value":"site_tags","label":"Site Tags"},
+                        {"value":"film_tags","label":"Film Tags"},
+                        {"value":"topic_tags","label":"Topic Tags"},
+                        {"value":"expiration_status","label":"Expiration Status"},
+                        {"value":"media_manager_id","label":"Media Manager ID"},
+                        {"value":"season","label":"Season"},
+                        {"value":"episode","label":"Episode"},
                     {"optgroup":"From PBS API","label":"From PBS API"},
-                        {"value":"slug","label":"slug"},{"value":"title","label":"title"},{"value":"title_sortable","label":"title_sortable"},{"value":"description_short","label":"description_short"},{"value":"description_long","label":"description_long"},{"value":"object_type","label":"object_type"},{"value":"premiered_on","label":"premiered_on"},{"value":"encored_on","label":"encored_on"},{"value":"is_excluded_from_dfp","label":"is_excluded_from_dfp"},{"value":"duration","label":"duration"},{"value":"content_rating","label":"content_rating"},{"value":"content_rating_descriptor","label":"content_rating_descriptor"},{"value":"can_embed_player","label":"can_embed_player"},{"value":"tags","label":"tags"},{"value":"language","label":"language"},{"value":"funder_message","label":"funder_message"},{"value":"images","label":"images"},{"value":"updated_at","label":"updated_at"},{"value":"countries","label":"countries"},{"value":"geo_profile","label":"geo_profile"},{"value":"topics","label":"topics"},{"value":"platforms","label":"platforms"},{"value":"player_code","label":"player_code"},{"value":"availabilities","label":"availabilities"},{"value":"related_links","label":"related_links"},{"value":"related_promos","label":"related_promos"},{"value":"parent_tree","label":"parent_tree"},{"value":"has_captions","label":"has_captions"}
+                        {"value":"slug","label":"slug"},
+                        {"value":"title","label":"title"},
+                        {"value":"title_sortable","label":"title_sortable"},
+                        {"value":"description_short","label":"description_short"},
+                        {"value":"description_long","label":"description_long"},
+                        {"value":"object_type","label":"object_type"},
+                        {"value":"premiered_on","label":"premiered_on"},
+                        {"value":"encored_on","label":"encored_on"},
+                        {"value":"is_excluded_from_dfp","label":"is_excluded_from_dfp"},
+                        {"value":"duration","label":"duration"},
+                        {"value":"content_rating","label":"content_rating"},
+                        {"value":"content_rating_descriptor","label":"content_rating_descriptor"},
+                        {"value":"can_embed_player","label":"can_embed_player"},
+                        {"value":"tags","label":"tags"},
+                        {"value":"language","label":"language"},
+                        {"value":"funder_message","label":"funder_message"},
+                        {"value":"images","label":"images"},
+                        {"value":"updated_at","label":"updated_at"},
+                        {"value":"countries","label":"countries"},
+                        {"value":"geo_profile","label":"geo_profile"},
+                        {"value":"topics","label":"topics"},
+                        {"value":"platforms","label":"platforms"},
+                        {"value":"player_code","label":"player_code"},
+                        {"value":"availabilities","label":"availabilities"},
+                        {"value":"related_links","label":"related_links"},
+                        {"value":"related_promos","label":"related_promos"},
+                        {"value":"parent_tree","label":"parent_tree"},
+                        {"value":"has_captions","label":"has_captions"}
                 ]
             },
-            { 
-                heading: 'Use existing Craft Field', 
+            {
+                heading: 'Use existing Craft Field',
                 handle: 'existingField',
                 info: 'If selected, you dont need to fill <strong>Craft Field Name</strong>, <strong>Craft Field Handle</strong> and <strong>Craft Field Type</strong>.',
                 width: '20%',
                 type: 'select',
                 options: existingFields
             },
-            { 
-                heading: 'Craft Field Name', 
+            {
+                heading: 'Craft Field Name',
                 handle: 'fieldName',
                 info: 'If <strong>Use existing Craft Field</strong> selected, you dont need to fill this field since it will be ignored.',
                 width: '20%',
                 type: 'singleline',
                 placeholder: 'Field Name'
             },
-            { 
-                heading: 'Craft Field Handle', 
+            {
+                heading: 'Craft Field Handle',
                 handle: 'fieldHandle',
                 info: 'Make sure field handle is in camelCase format and unique, existing field with same Field Handle will be used if found. If <strong>Use existing Craft Field</strong> selected, you dont need to fill this field since it will be ignored.',
                 width: '20%',
                 type: 'singleline',
                 placeholder: 'Field Name'
             },
-            { 
-                heading: 'Craft Field Type', 
+            {
+                heading: 'Craft Field Type',
                 handle: 'fieldType',
                 info: 'If <strong>Use existing Craft Field</strong> selected, you dont need to fill this field since it will be ignored.',
                 width: '20%',
                 type: 'select',
                 options: [
                     {"label":"— Select Field Type —"},
-                    {"value":"craft\\fields\\Assets","label":"Assets"},{"value":"craft\\fields\\Date","label":"Date/Time"},{"value":"craft\\fields\\Lightswitch","label":"Lightswitch"},{"value":"craft\\fields\\PlainText","label":"Plain Text"},{"value":"craft\\redactor\\Field","label":"Redactor"},{"value":"craft\\fields\\Tags","label":"Tags"}
+                    {"value":"craft\\fields\\Assets","label":"Assets"},
+                    {"value":"craft\\fields\\Date","label":"Date/Time"},
+                    {"value":"craft\\fields\\Lightswitch","label":"Lightswitch"},
+                    {"value":"craft\\fields\\PlainText","label":"Plain Text"},
+                    {"value":"craft\\redactor\\Field","label":"Redactor"},
+                    {"value":"craft\\ckeditor\\Field","label":"CKEditor"},
+                    {"value":"craft\\fields\\Tags","label":"Tags"}
                 ]
             }
         ]
@@ -117,53 +156,150 @@
         addRowLabel: 'Add a field',
         rows: settings.showApiColumnFields,
         errors: settings.getErrors( 'showApiColumnFields' ),
+        allowAdd: true,
+        allowReorder: true,
+        allowDelete: true,
         cols: [
-            { 
-                heading: 'API Field', 
+            {
+                heading: 'API Field',
                 handle: 'apiField',
                 width: '20%',
                 type: 'select',
                 options: [
                     {"label":"— Select Field —"},
-                    {"optgroup":"Special Field","label":"Special Field"},
-                        {"value":"show_images","label":"Images"},{"value":"show_last_synced","label":"Last Synced"},{"value":"show_media_manager_id","label":"Media Manager ID"},
-                    {"optgroup":"From PBS API","label":"From PBS API"},
-                        {"value":"description_short","label":"description_short"},{"value":"description_long","label":"description_long"}
+                    {
+                        "optgroup":"Special Field",
+                        "label":"Special Field"
+                    },
+                    {
+                        "value":"show_images",
+                        "label":"Images"
+                    },
+                    {
+                        "value":"show_last_synced",
+                        "label":"Last Synced"
+                    },
+                    {
+                        "value":"show_media_manager_id",
+                        "label":"Media Manager ID"
+                    },
+                    {
+                        "optgroup":"From PBS API",
+                        "label":"From PBS API"
+                    },
+                    {
+                        "value":"premiered_on",
+                        "label":"premiered_on"
+                    },
+                    {
+                        "value":"episodes_count",
+                        "label":"episodes_count"
+                    },
+                    {
+                        "value": "episode_availability",
+                        "label": "Episode Availability",
+                    },
+                    {
+                        "value":"links",
+                        "label":"links"
+                    },
+                    {
+                        "value": "platform_availability",
+                        "label": "Platform Availability"
+                    },
+                    {
+                        "value": "stream_with_passport",
+                        "label": "Stream with Passport (bool)"
+                    },
+                    {
+                        "value": "available_to_public",
+                        "label": "Available to Public (bool)"
+                    },
+                    {
+                        "value":"featured_preview",
+                        "label":"featured_preview"
+                    },
+                    {
+                        "value":"description_short",
+                        "label":"description_short"
+                    },
+                    {
+                        "value":"description_long",
+                        "label":"description_long"
+                    },
+                    {
+                        "value":"show_site_url",
+                        "label":"Show Site URL"
+                    },
+                    {
+                        "value":"available_for_purchase",
+                        "label":"Available for Purchase"
+                    },
+                    {
+                        "value": "slug",
+                        "label": "Slug",
+                    },
+                    {
+                        "value": "show_mezzanine",
+                        "label": "Mezzanine (Image)"
+                    },
+                    {
+                        "value": "show_poster",
+                        "label": "Poster (Image)"
+                    },
+                    {
+                        "value": "show_white_logo",
+                        "label": "Logo (White)"
+                    },
+                    {
+                        "value": "show_black_logo",
+                        "label": "Logo (Black)"
+                    },
+                    {
+                        "value": "show_color_logo",
+                        "label": "Logo (Color)"
+                    },
                 ]
             },
-            { 
-                heading: 'Use existing Craft Field', 
+            {
+                heading: 'Use existing Craft Field',
                 handle: 'existingField',
                 info: 'If selected, you dont need to fill <strong>Craft Field Name</strong>, <strong>Craft Field Handle</strong> and <strong>Craft Field Type</strong>.',
                 width: '20%',
                 type: 'select',
                 options: existingFields
             },
-            { 
-                heading: 'Craft Field Name', 
+            {
+                heading: 'Craft Field Name',
                 handle: 'fieldName',
                 info: 'If <strong>Use existing Craft Field</strong> selected, you dont need to fill this field since it will be ignored.',
                 width: '20%',
                 type: 'singleline',
                 placeholder: 'Field Name'
             },
-            { 
-                heading: 'Craft Field Handle', 
+            {
+                heading: 'Craft Field Handle',
                 handle: 'fieldHandle',
                 info: 'Make sure field handle is in camelCase format and unique, existing field with same Field Handle will be used if found. If <strong>Use existing Craft Field</strong> selected, you dont need to fill this field since it will be ignored.',
                 width: '20%',
                 type: 'singleline',
                 placeholder: 'Field Name'
             },
-            { 
-                heading: 'Craft Field Type', 
+            {
+                heading: 'Craft Field Type',
                 handle: 'fieldType',
                 info: 'If <strong>Use existing Craft Field</strong> selected, you dont need to fill this field since it will be ignored.',
                 width: '20%',
                 type: 'select',
                 options: [
                     {"label":"— Select Field Type —"},
-                    {"value":"craft\\fields\\Assets","label":"Assets"},{"value":"craft\\fields\\Date","label":"Date/Time"},{"value":"craft\\fields\\Lightswitch","label":"Lightswitch"},{"value":"craft\\fields\\PlainText","label":"Plain Text"},{"value":"craft\\redactor\\Field","label":"Redactor"},{"value":"craft\\fields\\Tags","label":"Tags"}
+                    {"value":"craft\\fields\\Assets","label":"Assets"},
+                    {"value":"craft\\fields\\Date","label":"Date/Time"},
+                    {"value":"craft\\fields\\Lightswitch","label":"Lightswitch"},
+                    {"value":"craft\\fields\\PlainText","label":"Plain Text"},
+                    {"value":"craft\\redactor\\Field","label":"Redactor"},
+                    {"value":"craft\\ckeditor\\Field","label":"CKEditor"},
+                    {"value":"craft\\fields\\Tags","label":"Tags"}
                 ]
             }
         ]
