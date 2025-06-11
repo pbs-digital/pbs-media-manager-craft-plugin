@@ -1,11 +1,11 @@
 <?php
 
-namespace papertiger\mediamanager\migrations;
+namespace pbsdigital\mediamanager\migrations;
 
 use Craft;
 use craft\db\Migration;
 use craft\helpers\ArrayHelper;
-use papertiger\mediamanager\helpers\SettingsHelper;
+use pbsdigital\mediamanager\helpers\SettingsHelper;
 use yii\base\Exception;
 use yii\base\InvalidConfigException;
 
@@ -26,15 +26,15 @@ class m230705_151024_add_marked_for_deletion_field extends Migration
 		    'plugins.mediamanager.schemaVersion',
 		    true
 	    );
-	
+
 	    if (version_compare($schemaVersion, '1.0.1', '<')) {
 		    $fieldService = Craft::$app->getFields();
 		    $field = $fieldService->getFieldByHandle('markedForDeletion');
-		
+
 		    if(!$field) {
 			    // we know this field will exist
 			    $groupToUse = $fieldService->getFieldByHandle('lastSynced')->groupId;
-			
+
 			    $field = Craft::$app->getFields()->createField([
 				    'type' => 'craft\fields\Lightswitch',
 				    'name' => 'Marked for Deletion',
@@ -42,18 +42,18 @@ class m230705_151024_add_marked_for_deletion_field extends Migration
 				    'groupId' => $groupToUse,
 				    'searchable' => true,
 			    ]);
-			
+
 			    Craft::$app->getFields()->saveField($field);
 		    }
-		
+
 		    $mediaSection = Craft::$app->getSections()->getSectionByHandle(SettingsHelper::get( 'mediaSection' ));
-		
+
 		    if($mediaSection) {
 			    $entryType = $mediaSection->getEntryTypes()[0];
 			    $fieldLayout = $entryType->getFieldLayout();
 			    $tabs = $fieldLayout->getTabs();
 					$fieldAdded = false;
-					
+
 					$newFieldLayoutElement = [
 						'type' => 'craft\fields\Lightswitch',
 						'fieldUid' => $field->uid,
@@ -61,7 +61,7 @@ class m230705_151024_add_marked_for_deletion_field extends Migration
 						'required' => false,
 						'sortOrder' => 0,
 					];
-					
+
 			    foreach($tabs as $tab) {
 				    if ($tab->name === 'API'){
 							$elements = $tab->elements;
@@ -75,19 +75,19 @@ class m230705_151024_add_marked_for_deletion_field extends Migration
 					    }
 				    }
 			    }
-					
+
 					if(!$fieldAdded) {
 						$elements = $tabs[0]->getElements();
 						$tabs[0]->setElements(array_merge($elements, [$newFieldLayoutElement]));
 					}
-					
+
 					$fieldLayout->setTabs($tabs);
 					Craft::$app->fields->saveLayout($fieldLayout);
 			    $entryType->setFieldLayout($fieldLayout);
 			    Craft::$app->getSections()->saveEntryType($entryType);
 		    }
 	    }
-			
+
     }
 
     /**

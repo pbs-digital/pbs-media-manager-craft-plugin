@@ -1,8 +1,8 @@
 {% extends "_layouts/cp" %}
 {% import "_includes/forms" as forms %}
 
-{% do view.registerAssetBundle( 'papertiger\\mediamanager\\assetbundles\\mediamanager\\MediaManagerAsset' ) %}
-{% do view.registerAssetBundle( 'papertiger\\mediamanager\\assetbundles\\showcpsection\\ShowCPSectionAsset' ) %}
+{% do view.registerAssetBundle( 'pbsdigital\\mediamanager\\assetbundles\\mediamanager\\MediaManagerAsset' ) %}
+{% do view.registerAssetBundle( 'pbsdigital\\mediamanager\\assetbundles\\showcpsection\\ShowCPSectionAsset' ) %}
 
 {% set title              = 'Show' %}
 {% set pluginCpUrl        = url( 'mediamanager' ) %}
@@ -47,11 +47,11 @@
 
 {# The content of the CP Section#}
 {% set content %}
-    
+
     {% if not craft.mediaManagerReady() %}
         {% include 'mediamanager/_settingsrequired' %}
     {% else %}
-        
+
         {% if activeShow | length and activeShow.siteId %}
 
             {% set selectedSite = activeShow.siteId[ 0 ] %}
@@ -120,11 +120,11 @@
                     required: true,
                 }) }}
             {% endif %}
-            
+
             <div id="addshowsite" class="btn add icon" tabindex="0">Add Show's Site</div> <br/><br/>
             <div id="showupdatebtn" class="btn submit" tabindex="1">{{ 'Update Show'|t( 'mediamanager' ) }}</div>
             <span></span>
-            
+
         {% else %}
             Nothing to see here, you might want to create New Show first.
         {% endif %}

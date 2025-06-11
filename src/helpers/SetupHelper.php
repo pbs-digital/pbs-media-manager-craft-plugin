@@ -2,25 +2,24 @@
 /**
  * Media Manager
  *
- * @package       PaperTiger:MediaManager
- * @author        Paper Tiger
- * @copyright     Copyright (c) 2020 Paper Tiger
- * @link          https://www.papertiger.com/
+ * @package       Media Manager
+ * @author        PBS Digital
+ * @link          https://github.com/pbs-digital/pbs-media-manager-craft-plugin
  */
 
-namespace papertiger\mediamanager\helpers;
+namespace pbsdigital\mediamanager\helpers;
 
 use Craft;
 use Exception;
 use craft\elements\User;
 
-use papertiger\mediamanager\base\ConstantAbstract;
+use pbsdigital\mediamanager\base\ConstantAbstract;
 
 class SetupHelper
 {
     // Public Static Methods
     // =========================================================================
-    
+
     public static function registerRequiredComponents()
     {
         // Craft CMS API User is now using plugin settings
@@ -30,5 +29,5 @@ class SetupHelper
     {
         // No Craft CMS API User removal
     }
-    
+
 }

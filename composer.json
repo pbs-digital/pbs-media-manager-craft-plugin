@@ -1,7 +1,7 @@
 {
-  "name": "moon/pbs-media-manager-craft-plugin",
+  "name": "pbs-digital/pbs-media-manager-craft-plugin",
   "description": "Media Manager 4 for PBS API",
-  "version": "4.0.6",
+  "version": "4.1.0",
   "type": "craft-plugin",
   "keywords": ["craftcms", "pbs", "media-manager"],
   "license": "MIT",
@@ -28,14 +28,14 @@
   },
   "autoload": {
     "psr-4": {
-      "papertiger\\mediamanager\\": "src/"
+      "pbsdigital\\mediamanager\\": "src/"
     }
   },
   "extra": {
     "handle": "mediamanager",
     "name": "Media Manager",
     "documentationUrl": "https://github.com/pbs/pbs-media-manager-craft-plugin/blob/main/README.md",
-    "class": "papertiger\\mediamanager\\MediaManager"
+    "class": "pbsdigital\\mediamanager\\MediaManager"
   },
   "config": {
     "allow-plugins": {

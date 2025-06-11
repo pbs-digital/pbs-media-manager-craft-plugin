@@ -2,21 +2,20 @@
 /**
  * Media Manager
  *
- * @package       PaperTiger:MediaManager
- * @author        Paper Tiger
- * @copyright     Copyright (c) 2020 Paper Tiger
- * @link          https://www.papertiger.com/
+ * @package       Media Manager
+ * @author        PBS Digital
+ * @link          https://github.com/pbs-digital/pbs-media-manager-craft-plugin
  */
 
-namespace papertiger\mediamanager\helpers;
+namespace pbsdigital\mediamanager\helpers;
 
 use Craft;
 use craft\helpers\App;
 use Exception;
 use craft\elements\User;
 
-use papertiger\mediamanager\base\ConstantAbstract;
-use papertiger\mediamanager\helpers\SettingsHelper;
+use pbsdigital\mediamanager\base\ConstantAbstract;
+use pbsdigital\mediamanager\helpers\SettingsHelper;
 
 class SynchronizeHelper
 {

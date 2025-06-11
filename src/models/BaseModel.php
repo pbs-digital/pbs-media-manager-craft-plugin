@@ -1,6 +1,6 @@
 <?php
 
-namespace papertiger\mediamanager\models;
+namespace pbsdigital\mediamanager\models;
 
 use craft\base\Model;
 
@@ -8,7 +8,7 @@ abstract class BaseModel extends Model
 {
 	// Public Methods
 	// =========================================================================
-	
+
 	/**
 	 * Populates a new model instance with a given set of attributes.
 	 *
@@ -20,23 +20,23 @@ abstract class BaseModel extends Model
 	public static function populateModel($values, bool $safeOnly = null): Model
 	{
 		$safeOnly = $safeOnly ?? true;
-		
+
 		// If an instance of a Yii model
 		if ($values instanceof \yii\base\Model) {
 			$values = $values->getAttributes();
 		}
-		
+
 		$class = static::class;
-		
+
 		$model = new $class();
 		$model->setAttributes($values, $safeOnly);
-		
+
 		// Re-initialise model
 		$model->init();
-		
+
 		return $model;
 	}
-	
+
 	/**
 	 * Mass-populates models based on an array of attribute arrays.
 	 *
@@ -49,15 +49,15 @@ abstract class BaseModel extends Model
 	public static function populateModels(array $data, bool $safeOnly = null, string $indexBy = null): array
 	{
 		$safeOnly = $safeOnly ?? true;
-		
+
 		$models = [];
-		
+
 		if (is_array($data))
 		{
 			foreach ($data as $values)
 			{
 				$model = static::populateModel($values, $safeOnly);
-				
+
 				if ($indexBy !== null)
 				{
 					$models[$model->{$indexBy}] = $model;
@@ -68,7 +68,7 @@ abstract class BaseModel extends Model
 				}
 			}
 		}
-		
+
 		return $models;
 	}
 }

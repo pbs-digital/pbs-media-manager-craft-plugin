@@ -2,22 +2,21 @@
 /**
  * Media Manager
  *
- * @package       PaperTiger:MediaManager
- * @author        Paper Tiger
- * @copyright     Copyright (c) 2020 Paper Tiger
- * @link          https://www.papertiger.com/
+ * @package       Media Manager
+ * @author        PBS Digital
+ * @link          https://github.com/pbs-digital/pbs-media-manager-craft-plugin
  */
 
-namespace papertiger\mediamanager\models;
+namespace pbsdigital\mediamanager\models;
 
 use Craft;
 use craft\base\Model;
 
-use papertiger\mediamanager\base\ConstantAbstract;
-use papertiger\mediamanager\validators\BasicAuthValidator;
-use papertiger\mediamanager\validators\CronExpressionValidator;
-use papertiger\mediamanager\validators\ApiColumnFieldsValidator;
-use papertiger\mediamanager\validators\ShowApiColumnFieldsValidator;
+use pbsdigital\mediamanager\base\ConstantAbstract;
+use pbsdigital\mediamanager\validators\BasicAuthValidator;
+use pbsdigital\mediamanager\validators\CronExpressionValidator;
+use pbsdigital\mediamanager\validators\ApiColumnFieldsValidator;
+use pbsdigital\mediamanager\validators\ShowApiColumnFieldsValidator;
 
 class SettingsModel extends Model
 {

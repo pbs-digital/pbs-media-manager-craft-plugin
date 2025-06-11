@@ -2,13 +2,12 @@
 /**
  * Media Manager
  *
- * @package       PaperTiger:MediaManager
- * @author        Paper Tiger
- * @copyright     Copyright (c) 2020 Paper Tiger
- * @link          https://www.papertiger.com/
+ * @package       Media Manager
+ * @author        PBS Digital
+ * @link          https://github.com/pbs-digital/pbs-media-manager-craft-plugin
  */
 
-namespace papertiger\mediamanager\jobs;
+namespace pbsdigital\mediamanager\jobs;
 
 use Craft;
 use craft\db\Query;
@@ -24,9 +23,9 @@ use craft\helpers\ElementHelper;
 use craft\helpers\Assets as AssetHelper;
 
 use DateTime;
-use papertiger\mediamanager\MediaManager;
-use papertiger\mediamanager\helpers\SettingsHelper;
-use papertiger\mediamanager\helpers\SynchronizeHelper;
+use pbsdigital\mediamanager\MediaManager;
+use pbsdigital\mediamanager\helpers\SettingsHelper;
+use pbsdigital\mediamanager\helpers\SynchronizeHelper;
 use yii\base\Exception;
 
 

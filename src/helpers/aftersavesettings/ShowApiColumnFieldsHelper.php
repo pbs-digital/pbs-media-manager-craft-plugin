@@ -2,13 +2,12 @@
 /**
  * Media Manager
  *
- * @package       PaperTiger:MediaManager
- * @author        Paper Tiger
- * @copyright     Copyright (c) 2020 Paper Tiger
- * @link          https://www.papertiger.com/
+ * @package       Media Manager
+ * @author        PBS Digital
+ * @link          https://github.com/pbs-digital/pbs-media-manager-craft-plugin
  */
 
-namespace papertiger\mediamanager\helpers\aftersavesettings;
+namespace pbsdigital\mediamanager\helpers\aftersavesettings;
 
 use Craft;
 use craft\models\TagGroup;
@@ -22,9 +21,9 @@ use craft\fields\Url;
 use craft\redactor\Field as Redactor;
 use craft\helpers\ElementHelper;
 
-use papertiger\mediamanager\MediaManager;
-use papertiger\mediamanager\base\ConstantAbstract;
-use papertiger\mediamanager\helpers\SettingsHelper;
+use pbsdigital\mediamanager\MediaManager;
+use pbsdigital\mediamanager\base\ConstantAbstract;
+use pbsdigital\mediamanager\helpers\SettingsHelper;
 
 class ShowApiColumnFieldsHelper
 {

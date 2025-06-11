@@ -2,13 +2,12 @@
 /**
  * Media Manager
  *
- * @package       PaperTiger:MediaManager
- * @author        Paper Tiger
- * @copyright     Copyright (c) 2020 Paper Tiger
- * @link          https://www.papertiger.com/
+ * @package       Media Manager
+ * @author        PBS Digital
+ * @link          https://github.com/pbs-digital/pbs-media-manager-craft-plugin
  */
 
-namespace papertiger\mediamanager\controllers;
+namespace pbsdigital\mediamanager\controllers;
 
 use Craft;
 use craft\base\Element;
@@ -16,7 +15,7 @@ use craft\helpers\Queue;
 use craft\helpers\UrlHelper;
 use craft\elements\Entry;
 use craft\web\Controller;
-use papertiger\mediamanager\jobs\CancelStaleMedia;
+use pbsdigital\mediamanager\jobs\CancelStaleMedia;
 use yii\base\Exception;
 use yii\base\InvalidConfigException;
 use yii\web\ForbiddenHttpException;
@@ -24,7 +23,7 @@ use yii\web\NotFoundHttpException;
 use yii\web\Response;
 use yii\web\ServerErrorHttpException;
 
-use papertiger\mediamanager\MediaManager;
+use pbsdigital\mediamanager\MediaManager;
 
 class MainController extends Controller
 {

@@ -2,13 +2,12 @@
 /**
  * Media Manager
  *
- * @package       PaperTiger:MediaManager
- * @author        Paper Tiger
- * @copyright     Copyright (c) 2020 Paper Tiger
- * @link          https://www.papertiger.com/
+ * @package       Media Manager
+ * @author        PBS Digital
+ * @link          https://github.com/pbs-digital/pbs-media-manager-craft-plugin
  */
 
-namespace papertiger\mediamanager\services;
+namespace pbsdigital\mediamanager\services;
 
 use Craft;
 use craft\helpers\App;
@@ -20,18 +19,18 @@ use craft\elements\db\ElementQuery;
 use GuzzleHttp\Exception\RequestException;
 use yii\base\Exception;
 
-use papertiger\mediamanager\MediaManager;
-use papertiger\mediamanager\jobs\MediaSync;
-use papertiger\mediamanager\jobs\MediaClean;
-use papertiger\mediamanager\jobs\ShowEntriesSync;
-use papertiger\mediamanager\helpers\SettingsHelper;
-use papertiger\mediamanager\helpers\SynchronizeHelper;
+use pbsdigital\mediamanager\MediaManager;
+use pbsdigital\mediamanager\jobs\MediaSync;
+use pbsdigital\mediamanager\jobs\MediaClean;
+use pbsdigital\mediamanager\jobs\ShowEntriesSync;
+use pbsdigital\mediamanager\helpers\SettingsHelper;
+use pbsdigital\mediamanager\helpers\SynchronizeHelper;
 
 class Api extends Component
 {
     // Private Properties
     // =========================================================================
-    
+
     protected static string $sectionMediaHandle;
     protected static string $sectionUsedMediaHandle;
     protected static string $apiBaseUrl;
@@ -194,7 +193,7 @@ class Api extends Component
                 foreach( $pages as $page ) {
 
                     foreach( $page[ 'pageBuilder' ]->all() as $parentBlock ) {
-                        
+
                         foreach( $parentBlock[ 'row' ]->all() as $component ) {
 
                             switch( $component[ 'type' ] ) {
@@ -212,7 +211,7 @@ class Api extends Component
                                     }
 
                                     foreach( $component[ 'selectedMedia' ]->anyStatus()->all() as $entry ) {
-                                        
+
                                         array_push( $usedMedia, [
                                             'id' => $entry[ 'id' ],
                                             'title' => $entry[ 'title' ],
@@ -251,7 +250,7 @@ class Api extends Component
             foreach( $entries as $entry ) {
 
                 $mediaManagerId = $entry[ 'mediaManagerId' ];
-                
+
                 if( array_key_exists( $mediaManagerId, $duplicateCounter ) ) {
                     $duplicateCounter[ $mediaManagerId ]++;
                 } else {
@@ -320,7 +319,7 @@ class Api extends Component
             }
 
             return $total;
-            
+
 
         } catch( Exception $e ) {
             return false;

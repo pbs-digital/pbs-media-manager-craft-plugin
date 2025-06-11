@@ -2,25 +2,24 @@
 /**
  * Media Manager
  *
- * @package       PaperTiger:MediaManager
- * @author        Paper Tiger
- * @copyright     Copyright (c) 2020 Paper Tiger
- * @link          https://www.papertiger.com/
+ * @package       Media Manager
+ * @author        PBS Digital
+ * @link          https://github.com/pbs-digital/pbs-media-manager-craft-plugin
  */
 
-namespace papertiger\mediamanager\helpers;
+namespace pbsdigital\mediamanager\helpers;
 
 use Craft;
 use Exception;
 
-use papertiger\mediamanager\base\ConstantAbstract;
-use papertiger\mediamanager\MediaManager;
+use pbsdigital\mediamanager\base\ConstantAbstract;
+use pbsdigital\mediamanager\MediaManager;
 
 class DependencyHelper
 {
     // Public Static Methods
     // =========================================================================
-    
+
     public static function installDependencies()
     {
         self::_installCraftRichtextPlugin();
@@ -63,24 +62,24 @@ class DependencyHelper
     private static function _installCraftRichtextPlugin(): void
     {
         $allowableRichtextPlugins = ConstantAbstract::DEPENDENCY_PLUGIN_CRAFT_RICHTEXT_PLUGINS;
-				
+
         $hasAllowablePluginInstalled = collect($allowableRichtextPlugins)->first(function($plugin, $key){
                 return self::checkPluginExists($plugin['handle']);
         });
-        
+
         if($hasAllowablePluginInstalled) {
             $plugin = MediaManager::getInstance();
             $plugin->settings->defaultRichtextField = $hasAllowablePluginInstalled;
-            
+
             return;
         }
-        
+
         $defaultPlugin = ConstantAbstract::DEFAULT_RICHTEXT_TYPE;
         $pluginHandle = $defaultPlugin['handle'];
 	      Craft::$app->getComposer()->install( [ $defaultPlugin['handle'] => $defaultPlugin['version'] ] );
 
         if( self::checkPluginDisabled( $pluginHandle ) && Craft::$app->getPlugins()->getStoredPluginInfo( $pluginHandle ) ) {
-            
+
             Craft::$app->getPlugins()->enablePlugin( $pluginHandle ); // Need to recheck this one
             return;
         }

@@ -2,20 +2,19 @@
 /**
  * Media Manager
  *
- * @package       PaperTiger:MediaManager
- * @author        Paper Tiger
- * @copyright     Copyright (c) 2020 Paper Tiger
- * @link          https://www.papertiger.com/
+ * @package       Media Manager
+ * @author        PBS Digital
+ * @link          https://github.com/pbs-digital/pbs-media-manager-craft-plugin
  */
 
-namespace papertiger\mediamanager\console\controllers;
+namespace pbsdigital\mediamanager\console\controllers;
 
 use Craft;
 use yii\console\Controller;
 use yii\helpers\Console;
 use yii\console\ExitCode;
 
-use papertiger\mediamanager\MediaManager;
+use pbsdigital\mediamanager\MediaManager;
 
 class SynchronizeConsoleController extends Controller
 {
@@ -34,9 +33,9 @@ class SynchronizeConsoleController extends Controller
         $validatedShows = [];
 
         foreach( $shows as $show ) {
-            
+
             if( $show->apiKey && $show->name ) {
-                
+
                 $show[ 'siteId' ] = json_decode( $show[ 'siteId' ] );
                 array_push( $validatedShows, $show );
             }

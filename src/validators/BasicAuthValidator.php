@@ -2,13 +2,12 @@
 /**
  * Media Manager
  *
- * @package       PaperTiger:MediaManager
- * @author        Paper Tiger
- * @copyright     Copyright (c) 2020 Paper Tiger
- * @link          https://www.papertiger.com/
+ * @package       Media Manager
+ * @author        PBS Digital
+ * @link          https://github.com/pbs-digital/pbs-media-manager-craft-plugin
  */
 
-namespace papertiger\mediamanager\validators;
+namespace pbsdigital\mediamanager\validators;
 
 use Craft;
 use craft\helpers\App;
@@ -20,10 +19,10 @@ class BasicAuthValidator extends Validator
 {
     // Public Methods
     // =========================================================================
-    
+
     public function validateAttribute( $model, $attribute )
     {
-        $apiBaseUrl      = $model->apiBaseUrl; 
+        $apiBaseUrl      = $model->apiBaseUrl;
         $pbsApiUsername  = '';
         $pbsApiPassword  = '';
 

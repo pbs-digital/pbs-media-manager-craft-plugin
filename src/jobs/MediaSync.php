@@ -2,13 +2,12 @@
 /**
  * Media Manager
  *
- * @package       PaperTiger:MediaManager
- * @author        Paper Tiger
- * @copyright     Copyright (c) 2020 Paper Tiger
- * @link          https://www.papertiger.com/
+ * @package       Media Manager
+ * @author        PBS Digital
+ * @link          https://github.com/pbs-digital/pbs-media-manager-craft-plugin
  */
 
-namespace papertiger\mediamanager\jobs;
+namespace pbsdigital\mediamanager\jobs;
 
 use Craft;
 use craft\db\Query;
@@ -24,9 +23,9 @@ use craft\helpers\ElementHelper;
 use craft\helpers\Assets as AssetHelper;
 
 use DateTime;
-use papertiger\mediamanager\MediaManager;
-use papertiger\mediamanager\helpers\SettingsHelper;
-use papertiger\mediamanager\helpers\SynchronizeHelper;
+use pbsdigital\mediamanager\MediaManager;
+use pbsdigital\mediamanager\helpers\SettingsHelper;
+use pbsdigital\mediamanager\helpers\SynchronizeHelper;
 use yii\base\Exception;
 
 class MediaSync extends BaseJob
@@ -57,7 +56,7 @@ class MediaSync extends BaseJob
     public bool $singleAsset = false;
     public ?string $singleAssetKey = null;
 
-    public bool $forceRegenerateThumbnail = false;
+    public ?bool $forceRegenerateThumbnail = false;
 
 
 		/**
@@ -224,17 +223,18 @@ class MediaSync extends BaseJob
                         foreach( $this->siteId as $siteId ) {
 
                             $site = Craft::$app->sites->getSiteById( $siteId );
-                            
-                            if(SynchronizeHelper::hasSiteBeenEntrified() && $siteTagSectionInfo = SynchronizeHelper::getSiteTagSectionInfo()){
-                                $tag = $this->findOrCreateTagEntry($site->name, $siteTagSectionInfo);
-                            } else {
-                                $tag = $this->findOrCreateTag($site->name, $siteTagGroupId);
-                            }
-                            
-                            if($tag){
-                                $this->siteTags[] = $tag->id;
-                            }
 
+                            if($site) {
+                                if(SynchronizeHelper::hasSiteBeenEntrified() && $siteTagSectionInfo = SynchronizeHelper::getSiteTagSectionInfo()){
+                                    $tag = $this->findOrCreateTagEntry($site->name, $siteTagSectionInfo);
+                                } else {
+                                    $tag = $this->findOrCreateTag($site->name, $siteTagGroupId);
+                                }
+
+                                if($tag){
+                                    $this->siteTags[] = $tag->id;
+                                }
+                            }
                         }
 
                         $defaultFields[ $siteTagFieldHandle ] = $this->siteTags;
@@ -244,7 +244,7 @@ class MediaSync extends BaseJob
 
                         // Prepare craft field handle and prepare tag group id
                         $filmTagFieldHandle = SynchronizeHelper::getFilmTagsField();
-                        
+
                         // Generate Film Tags
                         $parentTree = $assetAttributes->parent_tree;
 

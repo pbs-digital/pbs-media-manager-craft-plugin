@@ -2,21 +2,20 @@
 	/**
 	 * Media Manager
 	 *
-	 * @package       PaperTiger:MediaManager
-	 * @author        Paper Tiger
-	 * @copyright     Copyright (c) 2020 Paper Tiger
-	 * @link          https://www.papertiger.com/
+	 * @package       Media Manager
+	 * @author        PBS Digital
+	 * @link          https://github.com/pbs-digital/pbs-media-manager-craft-plugin
 	 */
-	
-	namespace papertiger\mediamanager\records;
-	
+
+	namespace pbsdigital\mediamanager\records;
+
 	use Craft;
 	use craft\db\ActiveRecord;
-	
+
 	use DateTime;
-	use papertiger\mediamanager\MediaManager;
-	use papertiger\mediamanager\base\ConstantAbstract;
-	
+	use pbsdigital\mediamanager\MediaManager;
+	use pbsdigital\mediamanager\base\ConstantAbstract;
+
 	/**
 	 * ScheduledSyncRecord
 	 * @return string the table name
@@ -34,22 +33,22 @@
 	{
 		// Private Properties
 		// =========================================================================
-		
+
 		private static $mediaManagerScheduledSyncTable = ConstantAbstract::MEDIAMANAGER_SCHEDULED_SYNC_TABLE;
-		
-		
+
+
 		// Public Static Methods
 		// =========================================================================
-		
+
 		public static function tableName(): string
 		{
 			return self::$mediaManagerScheduledSyncTable;
 		}
-		
-		
+
+
 		// Public Methods
 		// =========================================================================
-		
+
 		public function rules()
 		{
 			return [

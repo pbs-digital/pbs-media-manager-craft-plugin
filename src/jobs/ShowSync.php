@@ -2,17 +2,16 @@
 	/**
 	 * Media Manager
 	 *
-	 * @package       PaperTiger:MediaManager
-	 * @author        Paper Tiger
-	 * @copyright     Copyright (c) 2020 Paper Tiger
-	 * @link          https://www.papertiger.com/
+	 * @package       Media Manager
+	 * @author        PBS Digital
+	 * @link          https://github.com/pbs-digital/pbs-media-manager-craft-plugin
 	 */
 
-	namespace papertiger\mediamanager\jobs;
+	namespace pbsdigital\mediamanager\jobs;
 
 	use Craft;
 	use craft\queue\BaseJob;
-	use papertiger\mediamanager\MediaManager;
+	use pbsdigital\mediamanager\MediaManager;
 
 	class ShowSync extends BaseJob
 	{

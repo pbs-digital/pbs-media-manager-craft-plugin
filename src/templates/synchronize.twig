@@ -1,8 +1,8 @@
 {% extends '_layouts/cp' %}
 {% import '_includes/forms' as forms %}
 
-{% do view.registerAssetBundle( 'papertiger\\mediamanager\\assetbundles\\mediamanager\\MediaManagerAsset' ) %}
-{% do view.registerAssetBundle( 'papertiger\\mediamanager\\assetbundles\\synchronizecpsection\\SynchronizeCPSectionAsset' ) %}
+{% do view.registerAssetBundle( 'pbsdigital\\mediamanager\\assetbundles\\mediamanager\\MediaManagerAsset' ) %}
+{% do view.registerAssetBundle( 'pbsdigital\\mediamanager\\assetbundles\\synchronizecpsection\\SynchronizeCPSectionAsset' ) %}
 
 {% set title              = 'Synchronize' %}
 {% set pluginCpUrl        = url( 'mediamanager' ) %}
@@ -199,7 +199,7 @@
                         values: '*',
                         instructions: 'Choose which fields you would like to be updated during this sync.',
                     }) }}
-                    
+
                     {{ forms.selectField({
                         first: false,
                         label: "Media Asset's Site",

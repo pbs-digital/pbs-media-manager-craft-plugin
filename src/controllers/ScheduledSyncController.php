@@ -2,21 +2,20 @@
 	/**
 	 * Media Manager
 	 *
-	 * @package       PaperTiger:MediaManager
-	 * @author        Paper Tiger
-	 * @copyright     Copyright (c) 2020 Paper Tiger
-	 * @link          https://www.papertiger.com/
+	 * @package       Media Manager
+	 * @author        PBS Digital
+	 * @link          https://github.com/pbs-digital/pbs-media-manager-craft-plugin
 	 */
 
-	namespace papertiger\mediamanager\controllers;
+	namespace pbsdigital\mediamanager\controllers;
 
 	use Craft;
 	use craft\helpers\DateTimeHelper;
 	use craft\web\Controller;
 
 	use craft\web\Response;
-	use papertiger\mediamanager\MediaManager;
-	use papertiger\mediamanager\models\ScheduledSyncModel;
+	use pbsdigital\mediamanager\MediaManager;
+	use pbsdigital\mediamanager\models\ScheduledSyncModel;
 	use yii\web\BadRequestHttpException;
     use function join;
 

@@ -1,10 +1,10 @@
 <?php
 
-namespace papertiger\mediamanager\variables;
+namespace pbsdigital\mediamanager\variables;
 
 use Craft;
-use papertiger\mediamanager\MediaManager;
-use papertiger\mediamanager\records\Show as ShowRecord;
+use pbsdigital\mediamanager\MediaManager;
+use pbsdigital\mediamanager\records\Show as ShowRecord;
 
 class MediaManagerVariable
 {

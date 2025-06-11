@@ -2,28 +2,27 @@
 /**
  * Media Manager
  *
- * @package       PaperTiger:MediaManager
- * @author        Paper Tiger
- * @copyright     Copyright (c) 2020 Paper Tiger
- * @link          https://www.papertiger.com/
+ * @package       Media Manager
+ * @author        PBS Digital
+ * @link          https://github.com/pbs-digital/pbs-media-manager-craft-plugin
  */
 
-namespace papertiger\mediamanager\validators;
+namespace pbsdigital\mediamanager\validators;
 
 use Craft;
 use yii\validators\Validator;
 
-use papertiger\mediamanager\validators\CustomHandleValidator;
-use papertiger\mediamanager\base\ConstantAbstract;
+use pbsdigital\mediamanager\validators\CustomHandleValidator;
+use pbsdigital\mediamanager\base\ConstantAbstract;
 
 class ShowApiColumnFieldsValidator extends Validator
 {
     // Public Methods
     // =========================================================================
-    
+
     public function validateAttribute( $model, $attribute )
     {
-        $fields         = $model->{ $attribute }; 
+        $fields         = $model->{ $attribute };
         $fieldApis      = array_column( $fields, 0 );
         $existingField  = array_column( $fields, 1 );
         $fieldNames     = array_column( $fields, 2 );

@@ -1,10 +1,10 @@
 <?php
 
-namespace papertiger\mediamanager\migrations;
+namespace pbsdigital\mediamanager\migrations;
 
 use Craft;
 use craft\db\Migration;
-use papertiger\mediamanager\base\ConstantAbstract;
+use pbsdigital\mediamanager\base\ConstantAbstract;
 
 /**
  * m230926_143321_add_scheduled_sync_table migration.
@@ -19,7 +19,7 @@ class m230926_143322_add_scheduled_sync_table extends Migration
     public function safeUp()
     {
 	    $scheduledSyncTable = Craft::$app->db->schema->getTableSchema($this->scheduledSyncTable);
-			
+
 			if(!$scheduledSyncTable) {
 				$this->createTable($this->scheduledSyncTable, [
 					'id' => $this->primaryKey(),
@@ -32,7 +32,7 @@ class m230926_143322_add_scheduled_sync_table extends Migration
 					'dateUpdated' => $this->dateTime()->notNull(),
 					'uid' => $this->uid(),
 				]);
-				
+
 				$this->addForeignKey(
 					$this->db->getForeignKeyName($this->scheduledSyncTable, 'showId'),
 					$this->scheduledSyncTable,
@@ -51,11 +51,11 @@ class m230926_143322_add_scheduled_sync_table extends Migration
     public function safeDown()
     {
         echo "Dropping {$this->scheduledSyncTable} table.\n";
-				
+
 				$this->dropTableIfExists($this->scheduledSyncTable);
-				
+
 				echo "Dropped {$this->scheduledSyncTable} table.\n";
-				
+
         return true;
     }
 }

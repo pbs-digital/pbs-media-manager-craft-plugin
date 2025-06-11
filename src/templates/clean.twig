@@ -1,8 +1,8 @@
 {% extends "_layouts/cp" %}
 {% import "_includes/forms" as forms %}
 
-{% do view.registerAssetBundle( 'papertiger\\mediamanager\\assetbundles\\mediamanager\\MediaManagerAsset' ) %}
-{% do view.registerAssetBundle( 'papertiger\\mediamanager\\assetbundles\\synchronizecpsection\\SynchronizeCPSectionAsset' ) %}
+{% do view.registerAssetBundle( 'pbsdigital\\mediamanager\\assetbundles\\mediamanager\\MediaManagerAsset' ) %}
+{% do view.registerAssetBundle( 'pbsdigital\\mediamanager\\assetbundles\\synchronizecpsection\\SynchronizeCPSectionAsset' ) %}
 
 {% set title              = 'Clean Garbage Entries' %}
 {% set pluginCpUrl        = url( 'mediamanager' ) %}
@@ -16,7 +16,7 @@
     {% else %}
 
         {% if not craft.app.getPlugins().getPlugin( 'mediamanager' ).getSettings().mediaUsedBySection %}
-            
+
             You need to set <strong>Base</strong> > <strong>Section that use Media entries</strong> before running Clean Garbage Entries.<br/><br/>
             <a href="{{ url( 'settings/plugins/mediamanager' ) }}" class="btn submit">Go to Media Manager Settings</a>
             <span></span>

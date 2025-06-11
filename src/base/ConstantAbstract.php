@@ -2,29 +2,28 @@
 /**
  * Media Manager
  *
- * @package       PaperTiger:MediaManager
- * @author        Paper Tiger
- * @copyright     Copyright (c) 2020 Paper Tiger
- * @link          https://www.papertiger.com/
+ * @package       Media Manager
+ * @author        PBS Digital
+ * @link          https://github.com/pbs-digital/pbs-media-manager-craft-plugin
  */
 
-namespace papertiger\mediamanager\base;
+namespace pbsdigital\mediamanager\base;
 
 abstract class ConstantAbstract
 {
     // Constants
     // =========================================================================
-		
+
 		const DEPENDENCY_PLUGIN_CRAFT_RICHTEXT_PLUGINS = [
 			'ckeditor' => ['handle' => 'ckeditor', 'package' => 'craftcms/ckeditor', 'fieldtype' => 'craft\ckeditor\Field', 'version' => '^3.0.0'],
 			'redactor' => ['handle' => 'redactor', 'package' => 'craftcms/redactor', 'fieldtype' => 'craft\redactor\Field', 'version' => '^3.0.0']
 		];
-		
+
 		const DEFAULT_RICHTEXT_TYPE = self::DEPENDENCY_PLUGIN_CRAFT_RICHTEXT_PLUGINS['ckeditor'];
     const DEPENDENCY_PLUGIN_CRAFT_REDACTOR_HANDLE  = 'redactor';
     const DEPENDENCY_PLUGIN_CRAFT_REDACTOR_PACKAGE = 'craftcms/redactor';
     const DEPENDENCY_PLUGIN_CRAFT_REDACTOR_VERSION = '>=2.3.0';
-    
+
     const API_COLUMN_FIELDS  = [
         // Special Fields
         [ 'thumbnail', '', 'Thumbnail', 'thumbnail', 'craft\fields\Assets' ],
@@ -119,7 +118,7 @@ abstract class ConstantAbstract
     const API_COLUMN_FIELD_HANDLE_INDEX   = 3;
     const API_COLUMN_FIELD_TYPE_INDEX     = 4;
     const API_COLUMN_FIELD_RULE_INDEX     = 5;
-		
+
 		const DEFAULT_FIELD_GROUP = "Media Manager";
     const SYNC_SCHEDULE         = 'daily';
     const SYNC_CUSTOM_SCHEDULE  = '';
@@ -127,7 +126,7 @@ abstract class ConstantAbstract
 
     const MEDIAMANAGER_SHOW_TABLE_NAME         = 'mediamanager_show';
     const MEDIAMANAGER_SHOW_TABLE              = '{{%mediamanager_show}}';
-		
+
 		const MEDIAMANAGER_SCHEDULED_SYNC_TABLE    = '{{%mediamanager_scheduled_syncs}}';
     const MEDIAMANAGER_OLD_SETTINGS_TABLE_NAME = 'mediamanager_old_settings';
     const MEDIAMANAGER_OLD_SETTINGS_TABLE      = '{{%mediamanager_old_settings}}';
