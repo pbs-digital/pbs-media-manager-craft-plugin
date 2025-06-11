@@ -1,5 +1,8 @@
 # Changelog
 
+## 4.1.0 - 2025-06-11
+- Merges the KB, GA, and Food Media Manager plugins back into one repository. 
+
 ## 4.0.6 - 2025-04-08
 - fix type error when creating a scheduled sync that had empty Media Fields or Show Fields.
 - add ability to delete scheduled syncs
