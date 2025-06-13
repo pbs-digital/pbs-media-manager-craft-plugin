@@ -426,19 +426,7 @@ class MediaSync extends BaseJob
 
 
         $today = (new DateTime())->format('Y-m-d');
-        $mergedTags = implode(', ', array_merge($this->filmTags, $this->siteTags, $this->topicTags));
-
-//        Craft::dd([
-//            'thisFilmTags' => $this->filmTags,
-//            'filmTags' => $filmTags ?? null,
-//            'thisSiteTags' => $this->siteTags,
-//            'siteTags' => $siteTags ?? null,
-//            'thisTopicTags' => $this->topicTags,
-//            'topicTags' => $topicTags ?? null,
-//            'mergedTags' => $mergedTags,
-//            'siteId' => $this->siteId,
-//            'sectionId' => $this->sectionId,
-//        ]);
+        $mergedTags = implode(', ', array_merge($this->filmTags, $this->topicTags));
 
         Queue::push((new IdentifyStaleMedia([
             'date' => $today,
