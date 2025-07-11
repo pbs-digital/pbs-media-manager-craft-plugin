@@ -49,15 +49,13 @@ class IdentifyStaleMedia extends BaseJob
             // too generic, exit
             return;
         }
-
-
         $relatedMediaObjects = Entry::find()->sectionId($this->sectionId)->lastSynced("< {$this->date}")->relatedTo(['and', $this->tags])->markedForDeletion(0)->siteId($this->siteId)->ids();
 
         foreach($relatedMediaObjects as $media) {
-					if (!$this->_queueJobExists($media)) {
-						$queue = Craft::$app->getQueue();
-						$queue->push(new MarkStaleMedia(['entryId' => $media]));
-					}
+            if (!$this->_queueJobExists($media)) {
+                $queue = Craft::$app->getQueue();
+                $queue->push(new MarkStaleMedia(['entryId' => $media]));
+            }
         }
     }
 
@@ -72,13 +70,13 @@ class IdentifyStaleMedia extends BaseJob
 
     // Private Methods
     // =========================================================================
-		private function _queueJobExists(int $entryId): bool
-		{
-			// Preflight check to ensure regular queue in place
-			if(!Craft::$app->queue->hasProperty('jobInfo')){
-				return false;
-			}
+    private function _queueJobExists(int $entryId): bool
+    {
+        // Preflight check to ensure regular queue in place
+        if(!Craft::$app->queue->hasProperty('jobInfo')){
+            return false;
+        }
 
-			return in_array("Marking entry {$entryId} for deletion.", array_column(Craft::$app->queue->jobInfo, 'description'), true);
-		}
+        return in_array("Marking entry {$entryId} for deletion.", array_column(Craft::$app->queue->jobInfo, 'description'), true);
+    }
 }

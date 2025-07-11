@@ -1,5 +1,11 @@
 # Changelog
 
+## 4.1.2 - 2025-07-11
+- Sets a media entry's `postDate` attribute during creation. `postDate` is set to whichever is earlier between `availabilities->public->start` and `availabilities->all_members->start`
+
+## 4.1.1 - 2025-06-13
+- Removes Site Tags from getting merged into IdentifyStaleMedia job, which caused media from outside of the selected show to get updated.
+
 ## 4.1.0 - 2025-06-11
 - Merges the KB, GA, and Food Media Manager plugins back into one repository. 
 
