@@ -419,6 +419,16 @@ class MediaSync extends BaseJob
             $entry->setFieldValue('markedForDeletion', $markForDeletion);
             $entry->enabled = $this->isEntryEnabled($availabilities);
 
+
+            try {
+                $publicStartDate = new DateTime($availabilities->public->start);
+                $allMembersStartDate = new DateTime($availabilities->all_members->start);
+
+                $entry->postDate = min($publicStartDate, $allMembersStartDate);
+            } catch (\Exception $e) {
+                Craft::warning($e->getMessage(), __METHOD__);
+            }
+
             Craft::$app->getElements()->saveElement($entry);
             $this->setProgress($queue, $count++ / $totalAssets);
         }
