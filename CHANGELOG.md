@@ -1,5 +1,8 @@
 # Changelog
 
+## 4.1.3 - 2025-07-17
+- Fixes type error in MediaSync job that prevented triggering all show sync job.
+
 ## 4.1.2 - 2025-07-11
 - Sets a media entry's `postDate` attribute during creation. `postDate` is set to whichever is earlier between `availabilities->public->start` and `availabilities->all_members->start`
 
