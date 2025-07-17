@@ -48,7 +48,7 @@ class MediaSync extends BaseJob
     // =========================================================================
 
     public string $assetType = '';
-    public array $siteId = [];
+    public string|array $siteId = [];
     public string $title = '';
     public array $auth = [];
 
