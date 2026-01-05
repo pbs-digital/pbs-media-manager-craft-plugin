@@ -24,7 +24,7 @@ class SynchronizeHelper
 
     public static function getSectionId(): ?int
     {
-        $section = Craft::$app->sections->getSectionByHandle( SettingsHelper::get( 'mediaSection' ) );
+        $section = Craft::$app->entries->getSectionByHandle( SettingsHelper::get( 'mediaSection' ) );
 
         if( !$section ) {
             return null;
@@ -36,7 +36,7 @@ class SynchronizeHelper
     public static function getSectionTypeId(): ?int
     {
         $sectionId  = self::getSectionId();
-        $entryTypes = Craft::$app->sections->getEntryTypesBySectionId( $sectionId );
+        $entryTypes = Craft::$app->entries->getEntryTypesBySectionId( $sectionId );
 
         if( !is_array( $entryTypes ) && !$entryTypes[ 0 ] ) {
             return null;
@@ -47,7 +47,7 @@ class SynchronizeHelper
 
     public static function getShowSectionId(): ?int
     {
-        $section = Craft::$app->sections->getSectionByHandle( SettingsHelper::get( 'showSection' ) );
+        $section = Craft::$app->entries->getSectionByHandle( SettingsHelper::get( 'showSection' ) );
 
         if( !$section ) {
             return null;
@@ -62,14 +62,14 @@ class SynchronizeHelper
             return null;
         }
 
-        $section = Craft::$app->sections->getSectionByHandle( SettingsHelper::get( 'blogTagsSection' ) );
+        $section = Craft::$app->entries->getSectionByHandle( SettingsHelper::get( 'blogTagsSection' ) );
 
         if( !$section ) {
             return null;
         }
 
         $sectionId = $section->id;
-        $entryTypeId = Craft::$app->sections->getEntryTypesBySectionId( $sectionId );
+        $entryTypeId = Craft::$app->entries->getEntryTypesBySectionId( $sectionId );
 
         $res = ['id' => $sectionId];
 
@@ -85,14 +85,14 @@ class SynchronizeHelper
             return null;
         }
 
-        $section = Craft::$app->sections->getSectionByHandle( SettingsHelper::get( 'dateTagsSection' ) );
+        $section = Craft::$app->entries->getSectionByHandle( SettingsHelper::get( 'dateTagsSection' ) );
 
         if( !$section ) {
             return null;
         }
 
         $sectionId = $section->id;
-        $entryTypeId = Craft::$app->sections->getEntryTypesBySectionId( $sectionId );
+        $entryTypeId = Craft::$app->entries->getEntryTypesBySectionId( $sectionId );
 
         $res = ['id' => $sectionId];
 
@@ -108,14 +108,14 @@ class SynchronizeHelper
             return null;
         }
 
-        $section = Craft::$app->sections->getSectionByHandle( SettingsHelper::get( 'filmTagsSection' ) );
+        $section = Craft::$app->entries->getSectionByHandle( SettingsHelper::get( 'filmTagsSection' ) );
 
         if( !$section ) {
             return null;
         }
 
         $sectionId = $section->id;
-        $entryTypeId = Craft::$app->sections->getEntryTypesBySectionId( $sectionId );
+        $entryTypeId = Craft::$app->entries->getEntryTypesBySectionId( $sectionId );
 
         $res = ['id' => $sectionId];
 
@@ -132,14 +132,14 @@ class SynchronizeHelper
             return null;
         }
 
-        $section = Craft::$app->sections->getSectionByHandle( SettingsHelper::get( 'siteTagsSection' ) );
+        $section = Craft::$app->entries->getSectionByHandle( SettingsHelper::get( 'siteTagsSection' ) );
 
         if( !$section ) {
             return null;
         }
 
         $sectionId = $section->id;
-        $entryTypeId = Craft::$app->sections->getEntryTypesBySectionId( $sectionId );
+        $entryTypeId = Craft::$app->entries->getEntryTypesBySectionId( $sectionId );
 
         $res = ['id' => $sectionId];
 
@@ -155,14 +155,14 @@ class SynchronizeHelper
             return null;
         }
 
-        $section = Craft::$app->sections->getSectionByHandle( SettingsHelper::get( 'themeTagsSection' ) );
+        $section = Craft::$app->entries->getSectionByHandle( SettingsHelper::get( 'themeTagsSection' ) );
 
         if( !$section ) {
             return null;
         }
 
         $sectionId = $section->id;
-        $entryTypeId = Craft::$app->sections->getEntryTypesBySectionId( $sectionId );
+        $entryTypeId = Craft::$app->entries->getEntryTypesBySectionId( $sectionId );
 
         $res = ['id' => $sectionId];
 
@@ -178,14 +178,14 @@ class SynchronizeHelper
             return null;
         }
 
-        $section = Craft::$app->sections->getSectionByHandle( SettingsHelper::get( 'topicTagsSection' ) );
+        $section = Craft::$app->entries->getSectionByHandle( SettingsHelper::get( 'topicTagsSection' ) );
 
         if( !$section ) {
             return null;
         }
 
         $sectionId = $section->id;
-        $entryTypeId = Craft::$app->sections->getEntryTypesBySectionId( $sectionId );
+        $entryTypeId = Craft::$app->entries->getEntryTypesBySectionId( $sectionId );
 
         $res = ['id' => $sectionId];
 
@@ -201,14 +201,14 @@ class SynchronizeHelper
     //         return null;
     //     }
 
-    //     $section = Craft::$app->sections->getSectionByHandle( SettingsHelper::get( 'assetTypeTagsSection' ) );
+    //     $section = Craft::$app->entries->getSectionByHandle( SettingsHelper::get( 'assetTypeTagsSection' ) );
 
     //     if( !$section ) {
     //         return null;
     //     }
 
     //     $sectionId = $section->id;
-    //     $entryTypeId = Craft::$app->sections->getEntryTypesBySectionId( $sectionId );
+    //     $entryTypeId = Craft::$app->entries->getEntryTypesBySectionId( $sectionId );
 
     //     $res = ['id' => $sectionId];
 
@@ -226,7 +226,7 @@ class SynchronizeHelper
             return null;
         }
 
-        $entryTypes = Craft::$app->sections->getEntryTypesBySectionId( $sectionId );
+        $entryTypes = Craft::$app->entries->getEntryTypesBySectionId( $sectionId );
 
         if( !is_array( $entryTypes ) && !$entryTypes[ 0 ] ) {
             return null;

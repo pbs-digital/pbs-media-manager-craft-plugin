@@ -1,7 +1,7 @@
 {
   "name": "pbs-digital/pbs-media-manager-craft-plugin",
-  "description": "Media Manager 4 for PBS API",
-  "version": "4.1.3",
+  "description": "Media Manager 5 for PBS API",
+  "version": "5.0.0",
   "type": "craft-plugin",
   "keywords": ["craftcms", "pbs", "media-manager"],
   "license": "MIT",
@@ -22,9 +22,8 @@
     "docs": "https://github.com/pbs-digital/pbs-media-manager-craft-plugin/blob/main/README.md"
   },
   "require": {
-    "craftcms/cms": "^4.0.0",
-    "craftcms/redactor": "^3.0.0",
-    "craftcms/ckeditor": "^3.0.0"
+    "craftcms/cms": "^5.0.0",
+    "craftcms/ckeditor": "^4.11.0"
   },
   "autoload": {
     "psr-4": {

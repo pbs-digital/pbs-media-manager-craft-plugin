@@ -495,7 +495,7 @@ class MediaSync extends BaseJob
             return null;
         }
 
-        $section = Craft::$app->sections->getSectionById($sectionInfo['id']);
+        $section = Craft::$app->entries->getSectionById($sectionInfo['id']);
 
         $tag = Entry::find()
             ->title($title)
