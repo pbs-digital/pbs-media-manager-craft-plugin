@@ -1,5 +1,8 @@
 # Changelog
 
+## 4.1.4 - 2026-01-28
+- Fixes Shows page URLs in Plugin page.
+
 ## 4.1.3 - 2025-07-17
 - Fixes type error in MediaSync job that prevented triggering all show sync job.
 
