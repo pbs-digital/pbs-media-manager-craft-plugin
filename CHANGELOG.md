@@ -1,5 +1,8 @@
 # Changelog
 
+## 4.1.5 - 2026-02-13
+- Removes expiry date from media entries if they are null.
+
 ## 4.1.4 - 2026-01-28
 - Fixes Shows page URLs in Plugin page.
 
