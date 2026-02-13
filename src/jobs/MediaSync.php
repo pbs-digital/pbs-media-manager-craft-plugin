@@ -410,6 +410,8 @@ class MediaSync extends BaseJob
                 }
                 $tempExpiryDate = strtotime($availabilities->all_members->end);
                 $entry->expiryDate = new \DateTime(date('Y-m-d H:i:s', $tempExpiryDate));
+            } else {
+                $entry->expiryDate = null;
             }
 
             $markForDeletion = 0;
