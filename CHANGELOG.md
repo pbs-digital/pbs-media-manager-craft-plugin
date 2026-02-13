@@ -1,5 +1,11 @@
 # Changelog
 
+## 5.0.1 - 2026-02-13
+- Removes expiry date from media entries if they are null.
+
+## 5.0.0 
+- Adds support for Craft 5.
+
 ## 4.1.3 - 2025-07-17
 - Fixes type error in MediaSync job that prevented triggering all show sync job.
 
