@@ -26,7 +26,9 @@ use DateTime;
 use pbsdigital\mediamanager\MediaManager;
 use pbsdigital\mediamanager\helpers\SettingsHelper;
 use pbsdigital\mediamanager\helpers\SynchronizeHelper;
+use pbsdigital\mediamanager\records\Show;
 use yii\base\Exception;
+use function json_decode;
 
 
 class ShowEntriesSync extends BaseJob
@@ -43,7 +45,7 @@ class ShowEntriesSync extends BaseJob
     protected $mediaFolderId;
     protected $logProcess;
     protected $logFile;
-
+    protected $siteId;
 
     // Public Properties
     // =========================================================================
@@ -86,18 +88,30 @@ class ShowEntriesSync extends BaseJob
         $this->logProcess     = 1; // LOG_PROCESS
         $this->logFile        = '@storage/logs/sync.log'; // LOG_FILE
 
+        $this->siteId = Craft::$app->getSites()->getCurrentSite()->id;
+
+        $showRecord = Show::find()->where(['apiKey' => $this->apiKey])->one();
+
+        if($showRecord)
+        {
+            $this->siteId = (int)(json_decode($showRecord->siteId)[0]);
+        }
+
+
         $url      = $this->generateAPIUrl( $this->apiKey );
         $showEntry = $this->fetchShowEntry($url, '');
 
         $showAttributes = $showEntry->data->attributes;
 
         $existingEntry       = $this->findExistingShowEntry( $showEntry->data->id );
+
         $isNew = !$existingEntry;
         $entry               = $this->chooseOrCreateShowEntry( $showAttributes->title, $existingEntry );
 
 				$showImages = $showAttributes->images;
 				$showImagesKeywords = ['mezzanine', 'poster', 'white', 'black', 'color'];
 				$showImageArray = [];
+
 
 				if(isset($showImages) && is_array($showImages)) {
 					foreach( $showAttributes->images as $image ) {
@@ -394,6 +408,7 @@ class ShowEntriesSync extends BaseJob
         $entry->setFieldValues( $defaultFields );
         $entry->enabled = true;
 
+
         Craft::$app->getElements()->saveElement( $entry );
         $this->setProgress( $queue, 1 );
     }
@@ -555,8 +570,8 @@ class ShowEntriesSync extends BaseJob
             $entry->typeId    = $this->typeId;
             $entry->authorId  = $apiUserID;
             $entry->title     = $title;
+            $entry->siteId     = $this->siteId;
         }
-
         return $entry;
     }
 
