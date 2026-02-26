@@ -1,15 +1,9 @@
 {% import '_includes/forms' as forms %}
 
-{% set allFieldGroups = craft.app.fields.allGroups() %}
+{% set allFields = craft.app.fields.allFields() %}
 {% set existingFields = [ { label: '— Select Existing Field —', value: '' } ] %}
-{% for fieldGroup in allFieldGroups %}
-
-    {% set existingFields = existingFields | merge([{ optgroup: fieldGroup.name, label: fieldGroup.name }]) %}
-    {% set allGroupFields = craft.app.fields.getFieldsByGroupId( fieldGroup.id ) %}
-    {% for groupField in allGroupFields %}
-        {% set existingFields = existingFields | merge([{ label: groupField.name, value: groupField.handle }]) %}
-    {% endfor %}
-
+{% for field in allFields %}
+    {% set existingFields = existingFields | merge([{ label: field.name, value: field.handle }]) %}
 {% endfor %}
 
 {% set allusers   = [ { label: '— Select Craft User —', value: '' } ] %}
