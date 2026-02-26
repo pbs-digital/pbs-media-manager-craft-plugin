@@ -1,5 +1,9 @@
 # Changelog
 
+## 5.0.2 - 2026-02-26
+- Fixes plugin settings page that used deprecated methods.
+- Adds `siteId` to new Show entries during ShowMediaSync job.
+
 ## 5.0.1 - 2026-02-13
 - Removes expiry date from media entries if they are null.
 
