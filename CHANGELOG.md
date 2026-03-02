@@ -1,5 +1,9 @@
 # Changelog
 
+## 5.0.3 - 2026-03-02
+- Fixes required settings for Craft 5
+
+
 ## 5.0.2 - 2026-02-26
 - Fixes plugin settings page that used deprecated methods.
 - Adds `siteId` to new Show entries during ShowMediaSync job.
