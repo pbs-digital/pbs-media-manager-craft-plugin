@@ -107,9 +107,7 @@ abstract class ConstantAbstract
     ];
 
     const REQUIRED_SETTINGS = [
-        'mediaSection', 'mediaAssetVolume', 'mediaFieldGroup',
-        'apiBaseUrl', 'apiColumnFields',
-        'fieldLayout', 'syncSchedule'
+        'mediaSection', 'mediaAssetVolume','apiBaseUrl', 'apiColumnFields', 'syncSchedule'
     ];
 
     const API_COLUMN_FIELD_API_INDEX      = 0;
