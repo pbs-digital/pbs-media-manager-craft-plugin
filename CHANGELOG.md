@@ -1,6 +1,6 @@
 # Changelog
 
-## 5.0.3 - 2026-03-03
+## 5.0.4 - 2026-03-03
 - Fixes element pages for Media and Stale Media entries.
 
 ## 5.0.3 - 2026-03-02
