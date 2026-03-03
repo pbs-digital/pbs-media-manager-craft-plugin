@@ -1,74 +1,31 @@
-
-{% extends "_layouts/cp" %}
-
-{% set elementType     = 'craft\\elements\\Entry' %}
-{% set title           = "Media Entries" %}
-{% set elementInstance = craft.app.elements.createElement( elementType ) %}
-{% set context         = 'index' %}
-
-{% if not elementInstance %}
-    {% exit 404 %}
-{% endif %}
-
-{% set sources = craft.app.elementSources.getSources(elementType, 'index') %}
-{% set customizableSources = (sources is not empty and context == 'index' and currentUser.admin) %}
-
-{% set showSiteMenu = (craft.app.getIsMultiSite() ? (showSiteMenu ?? 'auto') : false) %}
-{% if showSiteMenu == 'auto' %}
-    {% set showSiteMenu = elementInstance.isLocalized() %}
-{% endif %}
-
-
-{% block contextMenu %}
-    {% if showSiteMenu %}
-        {% include "_elements/sitemenu" %}
-    {% endif %}
-{% endblock %}
-
 {% set pluginCpUrl        = url( 'mediamanager' ) %}
 {% set selectedSubnavItem = 'entries' %}
-{% set crumbs             = [ { label: "Media Manager", url: url( pluginCpUrl ) } ] %}
 
-{% block sidebar %}
-    {% if sources is not empty %}
-        <nav>
-            {% include "_elements/sources" %}
-        </nav>
+{% extends "_layouts/elementindex" %}
+{% set page = page ?? null %}
+{% set sectionHandle = 'media' %}
+{% set title           = "Media Entries" %}
 
-        {% if customizableSources %}
-            <div class="heading"><span></span></div>
-            <a class="customize-sources settings icon" title="{{ 'Customize sources'|t }}"></a>
-        {% endif %}
-    {% endif %}
-{% endblock %}
+{% set page = craft.app.elementSources.getFirstPage("craft\\elements\\Entry") %}
+{#{% if not page or not craft.app.elementSources.pageExists("craft\\elements\\Entry", page) %}#}
+{#  {% if sectionHandle is defined %}#}
+{#    {% set redirect = craft.app.entries.getSectionByHandle(sectionHandle).getCpIndexUri() ?? null %}#}
+{#    {% if redirect and redirect != craft.app.request.getPathInfo() %}#}
+{#      {% redirect redirect %}#}
+{#    {% endif %}#}
+{#  {% endif %}#}
 
+{#  {% set firstPage = craft.app.elementSources.getFirstPage("craft\\elements\\Entry") %}#}
+{#  {% if firstPage or page != 'entries' %}#}
+{#    {% redirect 'content/' ~ (firstPage ? firstPage|kebab : 'entries') %}#}
+{#  {% endif %}#}
+{#{% endif %}#}
 
-{% block content %}
-    <div class="elementindex">
-        {% include "_elements/indexcontainer" with {
-            showSiteMenu: false
-        } %}
-    </div>
-{% endblock %}
+{% set title = "Entries"|t('app') %}
+{% set elementType = 'craft\\elements\\Entry' %}
 
-
-{% block footer %}
-    <div id="count-container" class="light flex-grow">&nbsp;</div>
-    <div id="export-btn" class="btn">{{ 'Export…'|t('app') }}</div>
-{% endblock %}
-
-
-{% block initJs %}
-    Craft.elementIndex = Craft.createElementIndex('{{ elementType|e("js") }}', $('#main'), {
-        elementTypeName: '{{ elementInstance.displayName()|e("js") }}',
-        elementTypePluralName: '{{ 'Entries'|e("js") }}',
-        context: '{{ context }}',
-        storageKey: 'elementindex.{{ elementType|e("js") }}',
-        criteria: Craft.defaultIndexCriteria
-    });
-
-    var _mediaSource = $( '#sidebar nav ul li a[data-handle="{{ craft.app.getPlugins().getPlugin( 'mediamanager' ).getSettings().mediaSection }}"]' ).attr( 'data-key' );
-    Craft.elementIndex.selectSourceByKey( _mediaSource );
-{% endblock %}
-
-{% js block('initJs') %}
+{% if sectionHandle is defined %}
+  {% js %}
+    window.defaultSectionHandle = "{{ sectionHandle|e('js') }}";
+  {% endjs %}
+{% endif %}
