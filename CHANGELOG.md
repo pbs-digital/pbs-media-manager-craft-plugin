@@ -1,5 +1,8 @@
 # Changelog
 
+## 5.0.5 - 2026-03-09
+- Update composer requires to include CK Editor v5.1+
+
 ## 5.0.4 - 2026-03-03
 - Fixes element pages for Media and Stale Media entries.
 
