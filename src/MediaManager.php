@@ -19,7 +19,6 @@ use craft\web\Application;
 use craft\services\Plugins;
 use craft\helpers\UrlHelper;
 use craft\log\MonologTarget;
-use craft\models\FieldGroup;
 use craft\events\PluginEvent;
 use Monolog\Formatter\LineFormatter;
 use craft\events\RegisterUrlRulesEvent;
@@ -110,46 +109,8 @@ class MediaManager extends Plugin
 
     public function beforeInstall(): void
     {
-        if (version_compare(Craft::$app->getInfo()->version, '4.0', '<')) {
-            throw new Exception('Media Manager 4 requires Craft CMS 4.0+ in order to run.');
-        }
-    }
-
-    public function afterInstall(): void
-    {
-        //	create Media Manager field group
-        $fieldgroup = \craft\records\FieldGroup::find()->where(['name' => ConstantAbstract::DEFAULT_FIELD_GROUP])->one();
-
-        if (!$fieldgroup) {
-            $fieldgroup = new FieldGroup();
-            $fieldgroup->name = ConstantAbstract::DEFAULT_FIELD_GROUP;
-            Craft::$app->getFields()->saveGroup($fieldgroup);
-        }
-
-        foreach (ConstantAbstract::API_COLUMN_FIELDS as $field) {
-            $fieldExists = Craft::$app->getFields()->getFieldByHandle($field[3]);
-
-            if (!$fieldExists) {
-                $newField = Craft::$app->getFields()->createField([
-                    'type' => $field[4],
-                    'name' => $field[2],
-                    'handle' => $field[3],
-                    'groupId' => $fieldgroup->id
-                ]);
-            }
-        }
-
-        foreach (ConstantAbstract::SHOW_API_COLUMN_FIELDS as $field) {
-            $fieldExists = Craft::$app->getFields()->getFieldByHandle($field[3]);
-
-            if (!$fieldExists) {
-                $newField = Craft::$app->getFields()->createField([
-                    'type' => $field[4],
-                    'name' => $field[2],
-                    'handle' => $field[3],
-                    'groupId' => $fieldgroup->id
-                ]);
-            }
+        if (version_compare(Craft::$app->getInfo()->version, '5.0', '<')) {
+            throw new Exception('Media Manager 5 requires Craft CMS 5.0+ in order to run.');
         }
     }
 

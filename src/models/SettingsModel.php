@@ -26,7 +26,6 @@ class SettingsModel extends Model
     public $mediaSection;
     public $mediaUsedBySection;
     public $mediaAssetVolume;
-    public $mediaFieldGroup;
     public $showSection;
 
     public $blogTagsSection;

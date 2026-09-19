@@ -12,15 +12,8 @@
     {% set volumes = volumes | merge([{ label: volume.name, value: volume.handle }]) %}
 {% endfor %}
 
-{#{% set fieldGroups = [ { label: '— Select Field Group —', value: '' } ] %}#}
-{#{% set allFieldGroups = craft.app.fields.allGroups() %}#}
-{#{% for fieldGroup in allFieldGroups %}#}
-{#    {% set fieldGroups = fieldGroups | merge([{ label: fieldGroup.name, value: fieldGroup.id }]) %}#}
-{#{% endfor %}#}
-
 {% set mediaSectionInfo = 'Section to be used as Media entries.' ~ ( settings.mediaSection ? '' : ' <a target="_blank" href="'~ url( 'settings/sections/new' ) ~'">Create a blank section here.</a>' ) %}
 {% set mediaAssetInfo   = 'Asset Volume to store Media thumbnails and images.' ~ ( settings.mediaAssetVolume ? '' : ' <a target="_blank" href="'~ url( 'settings/assets/volumes/new' ) ~'">Create new Asset Volume here.</a>' ) %}
-{% set mediaFieldInfo   = 'Field Group to store all Media fields.' ~ ( settings.mediaFieldGroup ? '' : ' <a target="_blank" href="'~ url( 'settings/fields#newgroupbtn' ) ~'">Create a New group here.</a>' ) %}
 {% set showSectionInfo  = 'Section to be used as Show entries.' ~ ( settings.showSection ? '' : ' <a target="_blank" href="'~ url( 'settings/sections/new' ) ~'">Create a blank section here.</a>' ) %}
 
 <div id="tab-base">
@@ -55,17 +48,6 @@
         options: volumes,
         errors: settings.getErrors( 'mediaAssetVolume' )
     }) }}
-
-{#    {{ forms.selectField({#}
-{#        required: true,#}
-{#        name: 'mediaFieldGroup',#}
-{#        label: 'Media Field Group',#}
-{#        instructions: mediaFieldInfo,#}
-{#        fieldClass: 'flex-grow',#}
-{#        value: settings.mediaFieldGroup,#}
-{#        options: fieldGroups,#}
-{#        errors: settings.getErrors( 'mediaFieldGroup' )#}
-{#    }) }}#}
 
     <hr/>
 
