@@ -21,7 +21,6 @@
 {% set mediaSectionInfo = 'Section to be used as Media entries.' ~ ( settings.mediaSection ? '' : ' <a target="_blank" href="'~ url( 'settings/sections/new' ) ~'">Create a blank section here.</a>' ) %}
 {% set mediaAssetInfo   = 'Asset Volume to store Media thumbnails and images.' ~ ( settings.mediaAssetVolume ? '' : ' <a target="_blank" href="'~ url( 'settings/assets/volumes/new' ) ~'">Create new Asset Volume here.</a>' ) %}
 {% set mediaFieldInfo   = 'Field Group to store all Media fields.' ~ ( settings.mediaFieldGroup ? '' : ' <a target="_blank" href="'~ url( 'settings/fields#newgroupbtn' ) ~'">Create a New group here.</a>' ) %}
-{% set showSectionInfo  = 'Section to be used as Show entries.' ~ ( settings.showSection ? '' : ' <a target="_blank" href="'~ url( 'settings/sections/new' ) ~'">Create a blank section here.</a>' ) %}
 
 <div id="tab-base">
     {{ forms.selectField({
@@ -69,85 +68,31 @@
 
     <hr/>
 
+    {% for handle, toggleable in toggleableSections %}
+        {% set enabled = settings.isSectionEnabled( handle ) %}
 
-    {{ forms.selectField({
-        required: true,
-        name: 'showSection',
-        label: 'Show Section',
-        instructions: 'Section to be used for Show entries.' ~ ( settings.showSection ? '' : ' <a target="_blank" href="'~ url('settings/sections/new' ) ~'">Create a blank section here.</a>' ),
-        fieldClass: 'flex-grow',
-        value: settings.showSection,
-        options: sections,
-        errors: settings.getErrors( 'showSection' )
-    }) }}
+        {{ forms.lightswitchField({
+            name: 'enabledSections[' ~ handle ~ ']',
+            label: 'Use ' ~ toggleable.label,
+            instructions: 'Turn this off if this site does not use a ' ~ toggleable.label | lower ~ '. It will then be hidden and no longer required.',
+            on: enabled,
+            toggle: handle ~ '-field'
+        }) }}
 
-    <hr/>
+        {{ forms.selectField({
+            required: true,
+            id: handle,
+            name: handle,
+            label: toggleable.label,
+            instructions: toggleable.instructions ~ ( attribute( settings, handle ) ? '' : ' <a target="_blank" href="'~ url( 'settings/sections/new' ) ~'">Create a blank section here.</a>' ),
+            fieldClass: enabled ? 'flex-grow' : 'flex-grow hidden',
+            value: attribute( settings, handle ),
+            options: sections,
+            errors: settings.getErrors( handle )
+        }) }}
 
-    {{ forms.selectField({
-        required: true,
-        name: 'blogTagsSection',
-        label: 'Blog Tag Section',
-        instructions: 'Section to be used for Blog Tag entries.' ~ ( settings.blogTagsSection ? '' : ' <a target="_blank" href="'~ url('settings/sections/new' ) ~'">Create a blank section here.</a>' ),
-        fieldClass: 'flex-grow',
-        value: settings.blogTagsSection,
-        options: sections,
-        errors: settings.getErrors( 'blogTagsSection' )
-    }) }}
-
-    {{ forms.selectField({
-        required: true,
-        name: 'dateTagsSection',
-        label: 'Date Tag Section',
-        instructions: 'Section to be used for Date Tag entries.' ~ ( settings.dateTagsSection ? '' : ' <a target="_blank" href="'~ url('settings/sections/new' ) ~'">Create a blank section here.</a>' ),
-        fieldClass: 'flex-grow',
-        value: settings.dateTagsSection,
-        options: sections,
-        errors: settings.getErrors( 'dateTagsSection' )
-    }) }}
-
-    {{ forms.selectField({
-        required: true,
-        name: 'filmTagsSection',
-        label: 'Film Tag Section',
-        instructions: 'Section to be used for Film Tag entries.' ~ ( settings.filmTagsSection ? '' : ' <a target="_blank" href="'~ url('settings/sections/new' ) ~'">Create a blank section here.</a>' ),
-        fieldClass: 'flex-grow',
-        value: settings.filmTagsSection,
-        options: sections,
-        errors: settings.getErrors( 'filmTagsSection' )
-    }) }}
-
-    {{ forms.selectField({
-        required: true,
-        name: 'siteTagsSection',
-        label: 'Site Tag Section',
-        instructions: 'Section to be used for Site Tag entries.' ~ ( settings.siteTagsSection ? '' : ' <a target="_blank" href="'~ url('settings/sections/new' ) ~'">Create a blank section here.</a>' ),
-        fieldClass: 'flex-grow',
-        value: settings.siteTagsSection,
-        options: sections,
-        errors: settings.getErrors( 'siteTagsSection' )
-    }) }}
-
-    {{ forms.selectField({
-        required: true,
-        name: 'themeTagsSection',
-        label: 'Theme Tag Section',
-        instructions: 'Section to be used for Theme Tag entries.' ~ ( settings.themeTagsSection ? '' : ' <a target="_blank" href="'~ url('settings/sections/new' ) ~'">Create a blank section here.</a>' ),
-        fieldClass: 'flex-grow',
-        value: settings.themeTagsSection,
-        options: sections,
-        errors: settings.getErrors( 'themeTagsSection' )
-    }) }}
-
-    {{ forms.selectField({
-        required: true,
-        name: 'topicTagsSection',
-        label: 'Topic Tag Section',
-        instructions: 'Section to be used for Topic Tag entries.' ~ ( settings.topicTagsSection ? '' : ' <a target="_blank" href="'~ url('settings/sections/new' ) ~'">Create a blank section here.</a>' ),
-        fieldClass: 'flex-grow',
-        value: settings.topicTagsSection,
-        options: sections,
-        errors: settings.getErrors( 'topicTagsSection' )
-    }) }}
+        <hr/>
+    {% endfor %}
 
     {# {{ forms.selectField({
         required: true,

@@ -31,6 +31,15 @@ class SettingsHelper
         return self::settings()->{ $key } ?? null;
     }
 
+    /**
+     * Whether a toggleable section (ConstantAbstract::TOGGLEABLE_SECTIONS) is
+     * switched on for this site.
+     */
+    public static function sectionEnabled( $key )
+    {
+        return self::settings()->isSectionEnabled( $key );
+    }
+
     public static function set( array $settings )
     {
         Craft::$app->getPlugins()->savePluginSettings( MediaManager::$plugin, $settings );
@@ -45,7 +54,8 @@ class SettingsHelper
             'plugin'        => MediaManager::$plugin,
             'settings'      => self::settings(),
             'users'         => User::find()->all(),
-            'isCraft35'     => $isCraft35
+            'isCraft35'     => $isCraft35,
+            'toggleableSections' => ConstantAbstract::TOGGLEABLE_SECTIONS
         ];
     }
 }
