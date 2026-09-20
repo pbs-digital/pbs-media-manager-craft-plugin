@@ -106,6 +106,42 @@ abstract class ConstantAbstract
         'API' => [ 'showMediaManagerId', 'showLastSynced' ]
     ];
 
+    /**
+     * Sections that a site may or may not actually use. Each one can be
+     * switched off on the settings screen, which hides its Section select and
+     * drops the "required" validation for it.
+     */
+    const TOGGLEABLE_SECTIONS = [
+        'showSection' => [
+            'label'        => 'Show Section',
+            'instructions' => 'Section to be used for Show entries.'
+        ],
+        'blogTagsSection' => [
+            'label'        => 'Blog Tag Section',
+            'instructions' => 'Section to be used for Blog Tag entries.'
+        ],
+        'dateTagsSection' => [
+            'label'        => 'Date Tag Section',
+            'instructions' => 'Section to be used for Date Tag entries.'
+        ],
+        'filmTagsSection' => [
+            'label'        => 'Film Tag Section',
+            'instructions' => 'Section to be used for Film Tag entries.'
+        ],
+        'siteTagsSection' => [
+            'label'        => 'Site Tag Section',
+            'instructions' => 'Section to be used for Site Tag entries.'
+        ],
+        'themeTagsSection' => [
+            'label'        => 'Theme Tag Section',
+            'instructions' => 'Section to be used for Theme Tag entries.'
+        ],
+        'topicTagsSection' => [
+            'label'        => 'Topic Tag Section',
+            'instructions' => 'Section to be used for Topic Tag entries.'
+        ]
+    ];
+
     const REQUIRED_SETTINGS = [
         'mediaSection', 'mediaAssetVolume','apiBaseUrl', 'apiColumnFields', 'syncSchedule'
     ];

@@ -47,6 +47,10 @@ class SynchronizeHelper
 
     public static function getShowSectionId(): ?int
     {
+        if( !SettingsHelper::sectionEnabled( 'showSection' ) ) {
+            return null;
+        }
+
         $section = Craft::$app->entries->getSectionByHandle( SettingsHelper::get( 'showSection' ) );
 
         if( !$section ) {
@@ -58,7 +62,7 @@ class SynchronizeHelper
 
     public static function getBlogTagSectionInfo(): ?array
     {
-        if( !SettingsHelper::get( 'blogTagsSection' ) ) {
+        if( !SettingsHelper::sectionEnabled( 'blogTagsSection' ) || !SettingsHelper::get( 'blogTagsSection' ) ) {
             return null;
         }
 
@@ -81,7 +85,7 @@ class SynchronizeHelper
 
     public static function getDateTagSectionInfo(): ?array
     {
-        if( !SettingsHelper::get( 'dateTagsSection' ) ) {
+        if( !SettingsHelper::sectionEnabled( 'dateTagsSection' ) || !SettingsHelper::get( 'dateTagsSection' ) ) {
             return null;
         }
 
@@ -104,7 +108,7 @@ class SynchronizeHelper
 
     public static function getFilmTagSectionInfo(): ?array
     {
-        if( !SettingsHelper::get( 'filmTagsSection' ) ) {
+        if( !SettingsHelper::sectionEnabled( 'filmTagsSection' ) || !SettingsHelper::get( 'filmTagsSection' ) ) {
             return null;
         }
 
@@ -128,7 +132,7 @@ class SynchronizeHelper
     public static function getSiteTagSectionInfo(): ?array
     {
 
-        if( !SettingsHelper::get( 'siteTagsSection' ) ) {
+        if( !SettingsHelper::sectionEnabled( 'siteTagsSection' ) || !SettingsHelper::get( 'siteTagsSection' ) ) {
             return null;
         }
 
@@ -151,7 +155,7 @@ class SynchronizeHelper
 
     public static function getThemeTagSectionInfo(): ?array
     {
-        if( !SettingsHelper::get( 'themeTagsSection' ) ) {
+        if( !SettingsHelper::sectionEnabled( 'themeTagsSection' ) || !SettingsHelper::get( 'themeTagsSection' ) ) {
             return null;
         }
 
@@ -174,7 +178,7 @@ class SynchronizeHelper
 
     public static function getTopicTagSectionInfo(): ?array
     {
-        if( !SettingsHelper::get( 'topicTagsSection' ) ) {
+        if( !SettingsHelper::sectionEnabled( 'topicTagsSection' ) || !SettingsHelper::get( 'topicTagsSection' ) ) {
             return null;
         }
 
