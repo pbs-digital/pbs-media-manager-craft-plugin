@@ -1,5 +1,12 @@
 # Changelog
 
+## 5.0.6 - 2026-10-02
+- Changes the "Craft User for API" setting to a native user element picker instead of a dropdown of every user. The setting now stores the user's element ID; installs that stored a username keep working.
+- Display Passport Icon and Site Tags are no longer required API column fields. Sites that don't map them skip them during sync; sites that do are unaffected.
+- Adds per-site enable toggles for the Show Section and the six Tag Sections (Blog, Date, Film, Site, Theme, Topic). Sections that a site doesn't use can be switched off, which hides their select and drops the required validation. Existing installs keep their current behaviour: a section that already has a value stays enabled, one that doesn't starts off.
+- Fixes `Class "craft\records\FieldGroup" not found` fatal error on install. Field groups were removed in Craft 5, so the field group creation in `afterInstall()` has been dropped along with the `mediaFieldGroup` setting and all `groupId` references.
+- Fixes missing `mediamanager_scheduled_syncs` table on fresh installs. The table was only ever created by the `m230926_143322` migration, which Craft marks as applied without running it on a new install, so the Scheduler queries failed with `Base table or view not found`. The install migration now creates it.
+
 ## 5.0.5 - 2026-03-09
 - Update composer requires to include CK Editor v5.1+
 

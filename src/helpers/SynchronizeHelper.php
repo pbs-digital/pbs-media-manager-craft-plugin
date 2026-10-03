@@ -241,7 +241,7 @@ class SynchronizeHelper
 
     public static function getAuthorId()
     {
-        $user = Craft::$app->users->getUserByUsernameOrEmail( SettingsHelper::get( 'apiCraftUser' ) );
+        $user = self::getAuthor();
 
         if( !$user ) {
             return null;
@@ -252,7 +252,32 @@ class SynchronizeHelper
 
     public static function getAuthorUsername()
     {
-        return SettingsHelper::get( 'apiCraftUser' );
+        $user = self::getAuthor();
+
+        if( !$user ) {
+            return '';
+        }
+
+        return (string) $user->username;
+    }
+
+    /**
+     * The Craft user selected for API syncs.
+     *
+     * The setting stores an element ID now, but installs saved before the user
+     * picker stored a username, so both are resolved.
+     */
+    public static function getAuthor()
+    {
+        $value = SettingsHelper::get( 'apiCraftUser' );
+
+        if( !$value ) {
+            return null;
+        }
+
+        return is_numeric( $value )
+            ? Craft::$app->users->getUserById( (int) $value )
+            : Craft::$app->users->getUserByUsernameOrEmail( $value );
     }
 
     public static function getAssetFolderId()

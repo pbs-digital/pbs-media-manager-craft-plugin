@@ -61,9 +61,7 @@ abstract class ConstantAbstract
 
     const REQUIRED_FIELDS  = [
         'thumbnail',
-        'display_passport_icon',
         'last_synced',
-        'site_tags',
         'expiration_status',
         'media_manager_id'
     ];

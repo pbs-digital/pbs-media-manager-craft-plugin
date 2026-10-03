@@ -75,6 +75,19 @@ class SettingsModel extends Model
         return !empty( $this->{ $settingKey } );
     }
 
+    /**
+     * The user picker posts an array of element IDs; the setting stores a
+     * single scalar value.
+     */
+    public function beforeValidate(): bool
+    {
+        if( is_array( $this->apiCraftUser ) ) {
+            $this->apiCraftUser = reset( $this->apiCraftUser ) ?: '';
+        }
+
+        return parent::beforeValidate();
+    }
+
     public function rules(): array
     {
         $rules = [
