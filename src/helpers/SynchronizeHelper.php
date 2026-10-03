@@ -47,6 +47,10 @@ class SynchronizeHelper
 
     public static function getShowSectionId(): ?int
     {
+        if( !SettingsHelper::sectionEnabled( 'showSection' ) ) {
+            return null;
+        }
+
         $section = Craft::$app->entries->getSectionByHandle( SettingsHelper::get( 'showSection' ) );
 
         if( !$section ) {
@@ -58,7 +62,7 @@ class SynchronizeHelper
 
     public static function getBlogTagSectionInfo(): ?array
     {
-        if( !SettingsHelper::get( 'blogTagsSection' ) ) {
+        if( !SettingsHelper::sectionEnabled( 'blogTagsSection' ) || !SettingsHelper::get( 'blogTagsSection' ) ) {
             return null;
         }
 
@@ -81,7 +85,7 @@ class SynchronizeHelper
 
     public static function getDateTagSectionInfo(): ?array
     {
-        if( !SettingsHelper::get( 'dateTagsSection' ) ) {
+        if( !SettingsHelper::sectionEnabled( 'dateTagsSection' ) || !SettingsHelper::get( 'dateTagsSection' ) ) {
             return null;
         }
 
@@ -104,7 +108,7 @@ class SynchronizeHelper
 
     public static function getFilmTagSectionInfo(): ?array
     {
-        if( !SettingsHelper::get( 'filmTagsSection' ) ) {
+        if( !SettingsHelper::sectionEnabled( 'filmTagsSection' ) || !SettingsHelper::get( 'filmTagsSection' ) ) {
             return null;
         }
 
@@ -128,7 +132,7 @@ class SynchronizeHelper
     public static function getSiteTagSectionInfo(): ?array
     {
 
-        if( !SettingsHelper::get( 'siteTagsSection' ) ) {
+        if( !SettingsHelper::sectionEnabled( 'siteTagsSection' ) || !SettingsHelper::get( 'siteTagsSection' ) ) {
             return null;
         }
 
@@ -151,7 +155,7 @@ class SynchronizeHelper
 
     public static function getThemeTagSectionInfo(): ?array
     {
-        if( !SettingsHelper::get( 'themeTagsSection' ) ) {
+        if( !SettingsHelper::sectionEnabled( 'themeTagsSection' ) || !SettingsHelper::get( 'themeTagsSection' ) ) {
             return null;
         }
 
@@ -174,7 +178,7 @@ class SynchronizeHelper
 
     public static function getTopicTagSectionInfo(): ?array
     {
-        if( !SettingsHelper::get( 'topicTagsSection' ) ) {
+        if( !SettingsHelper::sectionEnabled( 'topicTagsSection' ) || !SettingsHelper::get( 'topicTagsSection' ) ) {
             return null;
         }
 
@@ -237,7 +241,7 @@ class SynchronizeHelper
 
     public static function getAuthorId()
     {
-        $user = Craft::$app->users->getUserByUsernameOrEmail( SettingsHelper::get( 'apiCraftUser' ) );
+        $user = self::getAuthor();
 
         if( !$user ) {
             return null;
@@ -248,7 +252,32 @@ class SynchronizeHelper
 
     public static function getAuthorUsername()
     {
-        return SettingsHelper::get( 'apiCraftUser' );
+        $user = self::getAuthor();
+
+        if( !$user ) {
+            return '';
+        }
+
+        return (string) $user->username;
+    }
+
+    /**
+     * The Craft user selected for API syncs.
+     *
+     * The setting stores an element ID now, but installs saved before the user
+     * picker stored a username, so both are resolved.
+     */
+    public static function getAuthor()
+    {
+        $value = SettingsHelper::get( 'apiCraftUser' );
+
+        if( !$value ) {
+            return null;
+        }
+
+        return is_numeric( $value )
+            ? Craft::$app->users->getUserById( (int) $value )
+            : Craft::$app->users->getUserByUsernameOrEmail( $value );
     }
 
     public static function getAssetFolderId()

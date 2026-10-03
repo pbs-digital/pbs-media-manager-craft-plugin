@@ -23,6 +23,7 @@ class Install extends Migration
 
     private $mediaManagerShowTable        = ConstantAbstract::MEDIAMANAGER_SHOW_TABLE;
     private $mediaManagerOldSettingsTable = ConstantAbstract::MEDIAMANAGER_OLD_SETTINGS_TABLE;
+    private $mediaManagerScheduledSyncTable = ConstantAbstract::MEDIAMANAGER_SCHEDULED_SYNC_TABLE;
 
 
     // Public Properties
@@ -40,6 +41,7 @@ class Install extends Migration
 
         $this->createMediaManagerShowTable();
         $this->createMediaManagerOldSettingsTable();
+        $this->createMediaManagerScheduledSyncTable();
 
         return true;
     }
@@ -48,6 +50,8 @@ class Install extends Migration
     {
         $this->driver = Craft::$app->getConfig()->getDb()->driver;
 
+        // Dropped before the show table, which it has a foreign key on
+        $this->dropTableIfExists( $this->mediaManagerScheduledSyncTable );
         $this->dropTableIfExists( $this->mediaManagerShowTable );
         $this->dropTableIfExists( $this->mediaManagerOldSettingsTable );
 
@@ -121,6 +125,44 @@ class Install extends Migration
                     true
                 ),
                 $this->mediaManagerOldSettingsTable, 'id', true
+            );
+
+            Craft::$app->db->schema->refresh();
+        }
+    }
+
+    protected function createMediaManagerScheduledSyncTable()
+    {
+        $tableSchema = Craft::$app->db->schema->getTableSchema( $this->mediaManagerScheduledSyncTable );
+
+        if( $tableSchema === null ) {
+
+            $this->createTable(
+                $this->mediaManagerScheduledSyncTable,
+                [
+                    'id'                  => $this->primaryKey(),
+                    'name'                => $this->text(),
+                    'description'         => $this->text(),
+                    'showId'              => $this->integer()->notNull(),
+                    'scheduleDate'        => $this->dateTime()->notNull(),
+                    'processed'           => $this->boolean()->defaultValue( false ),
+                    'mediaFieldsToSync'   => $this->text(),
+                    'showFieldsToSync'    => $this->text(),
+                    'regenerateThumbnail' => $this->boolean(),
+                    'dateCreated'         => $this->dateTime()->notNull(),
+                    'dateUpdated'         => $this->dateTime()->notNull(),
+                    'uid'                 => $this->uid(),
+                ]
+            );
+
+            $this->addForeignKey(
+                $this->db->getForeignKeyName(
+                    $this->mediaManagerScheduledSyncTable,
+                    'showId'
+                ),
+                $this->mediaManagerScheduledSyncTable, 'showId',
+                $this->mediaManagerShowTable, 'id',
+                'CASCADE', 'CASCADE'
             );
 
             Craft::$app->db->schema->refresh();

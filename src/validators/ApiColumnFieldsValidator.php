@@ -31,7 +31,7 @@ class ApiColumnFieldsValidator extends Validator
         $requiredFields = ConstantAbstract::REQUIRED_FIELDS;
 
         if( array_diff( $requiredFields, $fieldApis ) ) {
-            $this->addError( $model, $attribute, 'Thumbnail, Display Passport Icon?, Last Synced, Site Tags, Expiration Status, Media Manager ID are required.' );
+            $this->addError( $model, $attribute, 'Thumbnail, Last Synced, Expiration Status, Media Manager ID are required.' );
         }
 
         // Check if required fields exists

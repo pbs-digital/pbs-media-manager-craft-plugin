@@ -61,9 +61,7 @@ abstract class ConstantAbstract
 
     const REQUIRED_FIELDS  = [
         'thumbnail',
-        'display_passport_icon',
         'last_synced',
-        'site_tags',
         'expiration_status',
         'media_manager_id'
     ];
@@ -106,6 +104,42 @@ abstract class ConstantAbstract
         'API' => [ 'showMediaManagerId', 'showLastSynced' ]
     ];
 
+    /**
+     * Sections that a site may or may not actually use. Each one can be
+     * switched off on the settings screen, which hides its Section select and
+     * drops the "required" validation for it.
+     */
+    const TOGGLEABLE_SECTIONS = [
+        'showSection' => [
+            'label'        => 'Show Section',
+            'instructions' => 'Section to be used for Show entries.'
+        ],
+        'blogTagsSection' => [
+            'label'        => 'Blog Tag Section',
+            'instructions' => 'Section to be used for Blog Tag entries.'
+        ],
+        'dateTagsSection' => [
+            'label'        => 'Date Tag Section',
+            'instructions' => 'Section to be used for Date Tag entries.'
+        ],
+        'filmTagsSection' => [
+            'label'        => 'Film Tag Section',
+            'instructions' => 'Section to be used for Film Tag entries.'
+        ],
+        'siteTagsSection' => [
+            'label'        => 'Site Tag Section',
+            'instructions' => 'Section to be used for Site Tag entries.'
+        ],
+        'themeTagsSection' => [
+            'label'        => 'Theme Tag Section',
+            'instructions' => 'Section to be used for Theme Tag entries.'
+        ],
+        'topicTagsSection' => [
+            'label'        => 'Topic Tag Section',
+            'instructions' => 'Section to be used for Topic Tag entries.'
+        ]
+    ];
+
     const REQUIRED_SETTINGS = [
         'mediaSection', 'mediaAssetVolume','apiBaseUrl', 'apiColumnFields', 'syncSchedule'
     ];
@@ -117,7 +151,6 @@ abstract class ConstantAbstract
     const API_COLUMN_FIELD_TYPE_INDEX     = 4;
     const API_COLUMN_FIELD_RULE_INDEX     = 5;
 
-		const DEFAULT_FIELD_GROUP = "Media Manager";
     const SYNC_SCHEDULE         = 'daily';
     const SYNC_CUSTOM_SCHEDULE  = '';
     const SYNC_PING_CHANGELOG   = 1;

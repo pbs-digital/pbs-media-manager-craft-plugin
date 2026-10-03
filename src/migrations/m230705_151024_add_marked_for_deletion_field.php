@@ -32,21 +32,17 @@ class m230705_151024_add_marked_for_deletion_field extends Migration
 		    $field = $fieldService->getFieldByHandle('markedForDeletion');
 
 		    if(!$field) {
-			    // we know this field will exist
-			    $groupToUse = $fieldService->getFieldByHandle('lastSynced')->groupId;
-
-			    $field = Craft::$app->getFields()->createField([
+			    $field = $fieldService->createField([
 				    'type' => 'craft\fields\Lightswitch',
 				    'name' => 'Marked for Deletion',
 				    'handle' => 'markedForDeletion',
-				    'groupId' => $groupToUse,
 				    'searchable' => true,
 			    ]);
 
 			    Craft::$app->getFields()->saveField($field);
 		    }
 
-		    $mediaSection = Craft::$app->getSections()->getSectionByHandle(SettingsHelper::get( 'mediaSection' ));
+		    $mediaSection = Craft::$app->getEntries()->getSectionByHandle(SettingsHelper::get( 'mediaSection' ));
 
 		    if($mediaSection) {
 			    $entryType = $mediaSection->getEntryTypes()[0];
@@ -84,7 +80,7 @@ class m230705_151024_add_marked_for_deletion_field extends Migration
 					$fieldLayout->setTabs($tabs);
 					Craft::$app->fields->saveLayout($fieldLayout);
 			    $entryType->setFieldLayout($fieldLayout);
-			    Craft::$app->getSections()->saveEntryType($entryType);
+			    Craft::$app->getEntries()->saveEntryType($entryType);
 		    }
 	    }
 

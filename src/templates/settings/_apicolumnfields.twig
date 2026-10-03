@@ -6,19 +6,17 @@
     {% set existingFields = existingFields | merge([{ label: field.name, value: field.handle }]) %}
 {% endfor %}
 
-{% set allusers   = [ { label: '— Select Craft User —', value: '' } ] %}
-{% for user in users %}
-    {% set allusers = allusers | merge([{ label: user.username, value: user.username }]) %}
-{% endfor %}
-
 <div id="tab-api-column-fields" class="hidden">
-    {{ forms.selectField({
+    {{ forms.elementSelectField({
         required: true,
+        id: 'apiCraftUser',
         name: 'apiCraftUser',
         label: 'Craft User for API',
         instructions: 'This Craft user will be used when the API populating entries in Craft.',
-        value: settings.apiCraftUser,
-        options: allusers,
+        elementType: 'craft\\elements\\User',
+        selectionLabel: 'Select a user',
+        limit: 1,
+        elements: apiCraftUserElements ?? [],
         errors: settings.getErrors( 'apiCraftUser' )
     }) }}
 

@@ -143,14 +143,12 @@ class ShowApiColumnFieldsHelper
 
     private static function craftFieldInformation( $field )
     {
-        $mediaFieldGroup  = SettingsHelper::get( 'mediaFieldGroup' );
         $mediaAssetVolume = SettingsHelper::get( 'mediaAssetVolume' );
 
         // Prepare basic information of the field
         $fieldInformation = [
-            'name'    => $field[ ConstantAbstract::API_COLUMN_FIELD_NAME_INDEX ],
-            'handle'  => $field[ ConstantAbstract::API_COLUMN_FIELD_HANDLE_INDEX ],
-            'groupId' => $mediaFieldGroup
+            'name'   => $field[ ConstantAbstract::API_COLUMN_FIELD_NAME_INDEX ],
+            'handle' => $field[ ConstantAbstract::API_COLUMN_FIELD_HANDLE_INDEX ]
         ];
 
         // Prepare asset volume for craft\fields\Assets;

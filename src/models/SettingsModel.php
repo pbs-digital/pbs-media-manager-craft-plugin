@@ -26,7 +26,6 @@ class SettingsModel extends Model
     public $mediaSection;
     public $mediaUsedBySection;
     public $mediaAssetVolume;
-    public $mediaFieldGroup;
     public $showSection;
 
     public $blogTagsSection;
@@ -36,6 +35,12 @@ class SettingsModel extends Model
     public $themeTagsSection;
     public $topicTagsSection;
     // public $assetTypeTagsSection;
+
+    /**
+     * Which of ConstantAbstract::TOGGLEABLE_SECTIONS this site actually uses,
+     * keyed by setting handle. Missing keys fall back to isSectionEnabled().
+     */
+    public $enabledSections = [];
 
     public $apiCraftUser        = '';
     public $apiBaseUrl          = '';
@@ -54,9 +59,38 @@ class SettingsModel extends Model
     // Public Methods
     // =========================================================================
 
+    /**
+     * Whether the given toggleable section is in use on this site.
+     *
+     * Installs that predate the toggles have no `enabledSections` value stored,
+     * so fall back to whether the section was already configured. That keeps
+     * existing setups validating exactly as they did before.
+     */
+    public function isSectionEnabled( string $settingKey ): bool
+    {
+        if( is_array( $this->enabledSections ) && array_key_exists( $settingKey, $this->enabledSections ) ) {
+            return (bool) $this->enabledSections[ $settingKey ];
+        }
+
+        return !empty( $this->{ $settingKey } );
+    }
+
+    /**
+     * The user picker posts an array of element IDs; the setting stores a
+     * single scalar value.
+     */
+    public function beforeValidate(): bool
+    {
+        if( is_array( $this->apiCraftUser ) ) {
+            $this->apiCraftUser = reset( $this->apiCraftUser ) ?: '';
+        }
+
+        return parent::beforeValidate();
+    }
+
     public function rules(): array
     {
-        return [
+        $rules = [
             [
                 ConstantAbstract::REQUIRED_SETTINGS,
                 'required'
@@ -84,7 +118,24 @@ class SettingsModel extends Model
             [
                 [ 'syncCustomSchedule' ],
                 CronExpressionValidator::class
+            ],
+            [
+                [ 'enabledSections' ],
+                'safe'
             ]
         ];
+
+        // Only require a section select when the site says it uses that section.
+        foreach( array_keys( ConstantAbstract::TOGGLEABLE_SECTIONS ) as $settingKey ) {
+            $rules[] = [
+                [ $settingKey ],
+                'required',
+                'when' => function( $model ) use ( $settingKey ) {
+                    return $model->isSectionEnabled( $settingKey );
+                }
+            ];
+        }
+
+        return $rules;
     }
 }

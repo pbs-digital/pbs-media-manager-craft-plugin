@@ -10,7 +10,6 @@
 namespace pbsdigital\mediamanager\helpers;
 
 use Craft;
-use craft\elements\User;
 use yii\base\Application;
 
 use pbsdigital\mediamanager\MediaManager;
@@ -31,10 +30,40 @@ class SettingsHelper
         return self::settings()->{ $key } ?? null;
     }
 
+    /**
+     * Whether a toggleable section (ConstantAbstract::TOGGLEABLE_SECTIONS) is
+     * switched on for this site.
+     */
+    public static function sectionEnabled( $key )
+    {
+        return self::settings()->isSectionEnabled( $key );
+    }
+
     public static function set( array $settings )
     {
         Craft::$app->getPlugins()->savePluginSettings( MediaManager::$plugin, $settings );
         Craft::$app->trigger( Application::EVENT_AFTER_REQUEST ); // This event required for triggering saveModifiedConfigData to run and store settings to database
+    }
+
+    /**
+     * The selected API user, as an element list for the user picker.
+     *
+     * The setting used to store a username, so fall back to a username/email
+     * lookup for installs saved before it became an element ID.
+     */
+    public static function apiCraftUserElements(): array
+    {
+        $value = self::get( 'apiCraftUser' );
+
+        if( !$value ) {
+            return [];
+        }
+
+        $user = is_numeric( $value )
+            ? Craft::$app->users->getUserById( (int) $value )
+            : Craft::$app->users->getUserByUsernameOrEmail( $value );
+
+        return $user ? [ $user ] : [];
     }
 
     public static function templateVariables()
@@ -44,8 +73,9 @@ class SettingsHelper
         return [
             'plugin'        => MediaManager::$plugin,
             'settings'      => self::settings(),
-            'users'         => User::find()->all(),
-            'isCraft35'     => $isCraft35
+            'apiCraftUserElements' => self::apiCraftUserElements(),
+            'isCraft35'     => $isCraft35,
+            'toggleableSections' => ConstantAbstract::TOGGLEABLE_SECTIONS
         ];
     }
 }
