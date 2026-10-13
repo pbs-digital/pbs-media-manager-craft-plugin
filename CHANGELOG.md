@@ -1,5 +1,13 @@
 # Changelog
 
+## 5.0.7 - 2026-10-13
+- Adds syncing of the `description_short` and `slug` API fields on media entries.
+- Fixes `description_long` never syncing to media entries because of a misspelled `description_log` case in the MediaSync job.
+- Fixes API column fields syncing into the wrong Craft fields when the settings rows aren't stored with sequential keys (e.g. after adding a row in the middle of the table). The field lookup used the row's position instead of its key, so every field after the out-of-order row wrote into its neighbor's field.
+- Fixes show-level resyncs stopping partway through a season, episode, or special. When the MediaSync job reached an expired asset it exited the whole job, so every asset after it in that list was skipped. Expired assets are now skipped individually.
+- Fixes show-level resyncs only queuing the first page of seasons, episodes, and specials from the Media Manager API. All pages are now fetched.
+- Media entries that fail to save during a sync now log their validation errors instead of failing silently.
+
 ## 5.0.6 - 2026-10-02
 - Changes the "Craft User for API" setting to a native user element picker instead of a dropdown of every user. The setting now stores the user's element ID; installs that stored a username keep working.
 - Display Passport Icon and Site Tags are no longer required API column fields. Sites that don't map them skip them during sync; sites that do are unaffected.
@@ -110,4 +118,3 @@
 ## 3.0.0 - 2020-06-10
 
 - Initial release.
-

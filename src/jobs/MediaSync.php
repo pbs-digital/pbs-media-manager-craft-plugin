@@ -318,11 +318,17 @@ class MediaSync extends BaseJob
                     case 'media_manager_id':
                         $defaultFields[SynchronizeHelper::getMediaManagerIdField()] = $mediaAsset->id;
                         break;
-                    case 'description_log':
+                    case 'description_long':
                         // Only if new entry add description
                         if (!$existingEntry) {
                             $defaultFields[SynchronizeHelper::getApiField($apiField)] = $assetAttributes->description_long;
                         }
+                        break;
+                    case 'description_short':
+                        $defaultFields[SynchronizeHelper::getApiField($apiField)] = $assetAttributes->description_short;
+                        break;
+                    case 'slug':
+                        $defaultFields[SynchronizeHelper::getApiField($apiField)] = $assetAttributes->slug;
                         break;
                     case 'duration':
                         $defaultFields[SynchronizeHelper::getApiField($apiField)] = $this->convertToReadableTime($assetAttributes->duration);
@@ -405,8 +411,9 @@ class MediaSync extends BaseJob
 
             if ($availabilities->all_members->end) {
                 if (DateTimeHelper::isInThePast($availabilities->all_members->end)) {
-                    Craft::warning("{$mediaAsset->id} is expired. Exiting.");
-                    return;
+                    Craft::warning("{$mediaAsset->id} is expired. Skipping.", __METHOD__);
+                    $this->setProgress($queue, $count++ / $totalAssets);
+                    continue;
                 }
                 $tempExpiryDate = strtotime($availabilities->all_members->end);
                 $entry->expiryDate = new \DateTime(date('Y-m-d H:i:s', $tempExpiryDate));
@@ -431,7 +438,9 @@ class MediaSync extends BaseJob
                 Craft::warning($e->getMessage(), __METHOD__);
             }
 
-            Craft::$app->getElements()->saveElement($entry);
+            if (!Craft::$app->getElements()->saveElement($entry)) {
+                Craft::error("Failed to save media entry for {$mediaAsset->id}: " . json_encode($entry->getErrors()), __METHOD__);
+            }
             $this->setProgress($queue, $count++ / $totalAssets);
         }
 
