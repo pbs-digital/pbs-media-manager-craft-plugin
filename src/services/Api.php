@@ -345,7 +345,7 @@ class Api extends Component
 
         $seasons = $this->getSeasonsOfShow( $show->apiKey );
 
-        foreach( $seasons->data as $season ) {
+        foreach( $seasons as $season ) {
 
             Craft::$app->queue->push( new MediaSync([
 
@@ -361,7 +361,7 @@ class Api extends Component
 
             $episodes = $this->getEpisodesOfShow( $season->id );
 
-            foreach( $episodes->data as $episode ) {
+            foreach( $episodes as $episode ) {
 
                 Craft::$app->queue->push( new MediaSync([
 
@@ -379,7 +379,7 @@ class Api extends Component
 
         $specials = $this->getSpecialsOfShow( $show->apiKey );
 
-        foreach( $specials->data as $special ) {
+        foreach( $specials as $special ) {
 
             Craft::$app->queue->push( new MediaSync([
 
@@ -397,28 +397,30 @@ class Api extends Component
 
     private function getSeasonsOfShow( $id )
     {
-        $client = Craft::createGuzzleClient();
-
-        $response = $client->get( self::$apiBaseUrl . 'shows/' . $id . '/seasons?platform-slug=bento&platform-slug=partnerplayer', self::$apiAuth );
-
-        return json_decode( $response->getBody() );
+        return $this->fetchAllPages( self::$apiBaseUrl . 'shows/' . $id . '/seasons?platform-slug=bento&platform-slug=partnerplayer' );
     }
 
     private function getEpisodesOfShow( $id )
     {
-        $client = Craft::createGuzzleClient();
-
-        $response = $client->get( self::$apiBaseUrl . 'seasons/' . $id . '/episodes?platform-slug=bento&platform-slug=partnerplayer', self::$apiAuth );
-
-        return json_decode( $response->getBody() );
+        return $this->fetchAllPages( self::$apiBaseUrl . 'seasons/' . $id . '/episodes?platform-slug=bento&platform-slug=partnerplayer' );
     }
 
     private function getSpecialsOfShow( $id )
     {
+        return $this->fetchAllPages( self::$apiBaseUrl . 'shows/' . $id . '/specials?platform-slug=bento&platform-slug=partnerplayer' );
+    }
+
+    private function fetchAllPages( $url )
+    {
         $client = Craft::createGuzzleClient();
+        $items  = [];
 
-        $response = $client->get(self::$apiBaseUrl . 'shows/' . $id . '/specials?platform-slug=bento&platform-slug=partnerplayer', self::$apiAuth );
+        while( $url ) {
+            $response = json_decode( $client->get( $url, self::$apiAuth )->getBody() );
+            $items    = array_merge( $items, $response->data ?? [] );
+            $url      = $response->links->next ?? null;
+        }
 
-        return json_decode( $response->getBody() );
+        return $items;
     }
 }

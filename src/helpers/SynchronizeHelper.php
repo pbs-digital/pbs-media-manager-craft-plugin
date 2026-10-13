@@ -448,7 +448,7 @@ class SynchronizeHelper
     private static function getCraftFieldHandleByApiHandle( $fieldApiHandle, $settingName = 'apiColumnFields' )
     {
         $fieldsToSearch = SettingsHelper::get( $settingName );
-        $fieldHandles   = array_column( $fieldsToSearch, ConstantAbstract::API_COLUMN_FIELD_API_INDEX );
+        $fieldHandles   = array_combine( array_keys( $fieldsToSearch ), array_column( $fieldsToSearch, ConstantAbstract::API_COLUMN_FIELD_API_INDEX ) );
         $foundIndex     = array_search( $fieldApiHandle, $fieldHandles );
 
         if( $foundIndex === false ) {
@@ -469,7 +469,7 @@ class SynchronizeHelper
     private static function getApiRuleByApiHandle( $fieldApiHandle, $settingName = 'apiColumnFields' )
     {
         $fieldsToSearch = SettingsHelper::get( $settingName );
-        $fieldHandles   = array_column( $fieldsToSearch, ConstantAbstract::API_COLUMN_FIELD_API_INDEX );
+        $fieldHandles   = array_combine( array_keys( $fieldsToSearch ), array_column( $fieldsToSearch, ConstantAbstract::API_COLUMN_FIELD_API_INDEX ) );
         $foundIndex     = array_search( $fieldApiHandle, $fieldHandles );
 
         if( $foundIndex === false ) {
