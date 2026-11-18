@@ -78,6 +78,12 @@
 			details: 'The date and time to run the sync.'|t('mediamanager'),
 		}) }}
 
+		{% set originalScheduleDate = originalScheduleDate ?? (scheduledSync.id and scheduledSync.scheduleDate ? scheduledSync.scheduleDate|date('c') : '') %}
+		{{ forms.hidden({
+			name: 'originalScheduleDate',
+			value: originalScheduleDate,
+		}) }}
+
 		{{ forms.selectField({
 			id: 'recurrenceInterval',
 			name: 'recurrenceInterval',

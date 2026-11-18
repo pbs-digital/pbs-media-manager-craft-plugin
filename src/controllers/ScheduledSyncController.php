@@ -91,7 +91,12 @@
 			}
 
 			$isNewSync = !$scheduledSync->id;
-			$previousScheduleTimestamp = $isNewSync ? null : DateTimeHelper::toDateTime($scheduledSync->scheduleDate)?->getTimestamp();
+			$previousScheduleDate = $isNewSync ? null : DateTimeHelper::toDateTime($scheduledSync->scheduleDate);
+
+			// The form may be stale (the series can advance after it was rendered), so compare
+			// the posted date with the date the form was rendered with, not the current DB value.
+			$originalScheduleParam = $request->getBodyParam('originalScheduleDate');
+			$originalScheduleDate = $originalScheduleParam ? DateTimeHelper::toDateTime($originalScheduleParam) : $previousScheduleDate;
 			$previousInterval = $scheduledSync->recurrenceInterval;
 			$previousCount = $scheduledSync->recurrenceCount;
 
@@ -107,10 +112,18 @@
 				? (int)$recurrenceCount
 				: null;
 
-			$newScheduleTimestamp = $scheduledSync->scheduleDate ? $scheduledSync->scheduleDate->getTimestamp() : null;
+			$newScheduleDate = $scheduledSync->scheduleDate;
+			$scheduleDateChanged = $isNewSync
+				|| !$originalScheduleDate
+				|| !$newScheduleDate
+				|| intdiv($newScheduleDate->getTimestamp(), 60) !== intdiv($originalScheduleDate->getTimestamp(), 60);
 
-			if ($isNewSync
-				|| $previousScheduleTimestamp !== $newScheduleTimestamp
+			if (!$scheduleDateChanged) {
+				// Unchanged by the editor: keep the DB value, the series may have advanced
+				$scheduledSync->scheduleDate = $previousScheduleDate;
+			}
+
+			if ($scheduleDateChanged
 				|| $previousInterval !== $scheduledSync->recurrenceInterval
 			) {
 				// New series: start over, anchored on the (new) schedule date
@@ -120,6 +133,11 @@
 			} elseif ($scheduledSync->isRecurring() && (int)$previousCount !== (int)$scheduledSync->recurrenceCount) {
 				// Count-only change: keep progress, re-evaluate completion
 				$scheduledSync->processed = (int)$scheduledSync->occurrencesRun >= (int)$scheduledSync->recurrenceCount ? 1 : 0;
+
+				if (!$scheduledSync->processed) {
+					// Re-opened series: pending row's date must be the date of its current slot
+					$scheduledSync->scheduleDate = $scheduledSync->getOccurrenceDate((int)$scheduledSync->occurrencesRun);
+				}
 			}
 
 			$scheduledSync->showId = $request->getBodyParam('showId');
@@ -140,7 +158,8 @@
 			if(!MediaManager::getInstance()->scheduledSync->saveScheduledSync($scheduledSync)) {
 				Craft::$app->getSession()->setError(Craft::t('mediamanager', 'Couldn’t save scheduled sync.'));
 				Craft::$app->getUrlManager()->setRouteParams([
-					'scheduledSync' => $scheduledSync
+					'scheduledSync' => $scheduledSync,
+					'originalScheduleDate' => $originalScheduleDate?->format('c'),
 				]);
 				return null;
 			}

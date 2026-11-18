@@ -159,7 +159,13 @@ class ScheduledSyncModel extends BaseModel
 	 */
 	public function getOccurrenceDate(int $k): ?DateTime
 	{
-		$start = DateTimeHelper::toDateTime($this->recurrenceStartDate ?: $this->scheduleDate);
+		// Without an anchor, scheduleDate is the date of slot occurrencesRun
+		if ($this->recurrenceStartDate) {
+			$start = DateTimeHelper::toDateTime($this->recurrenceStartDate);
+		} else {
+			$start = DateTimeHelper::toDateTime($this->scheduleDate);
+			$k -= (int)$this->occurrencesRun;
+		}
 
 		if (!$start) {
 			return null;
@@ -169,14 +175,14 @@ class ScheduledSyncModel extends BaseModel
 
 		switch ($this->recurrenceInterval) {
 			case self::RECURRENCE_DAILY:
-				return $date->modify('+' . $k . ' days');
+				return $date->modify(sprintf('%+d days', $k));
 			case self::RECURRENCE_WEEKLY:
-				return $date->modify('+' . ($k * 7) . ' days');
+				return $date->modify(sprintf('%+d days', $k * 7));
 			case self::RECURRENCE_MONTHLY:
 				$day = (int)$date->format('j');
 				$monthIndex = (int)$date->format('n') - 1 + $k;
-				$year = (int)$date->format('Y') + intdiv($monthIndex, 12);
-				$month = $monthIndex % 12 + 1;
+				$year = (int)$date->format('Y') + (int)floor($monthIndex / 12);
+				$month = $monthIndex - 12 * (int)floor($monthIndex / 12) + 1;
 				$lastDay = (int)(new DateTime(sprintf('%04d-%02d-01', $year, $month)))->format('t');
 				return $date->setDate($year, $month, min($day, $lastDay));
 			default:

@@ -35,7 +35,7 @@
 				<td>{{ scheduledSync.scheduleDate|datetime('M d, Y g:ia e') }}</td>
 				<td>
 					{% if scheduledSync.isRecurring() %}
-						{{ scheduledSync.recurrenceInterval|capitalize }} · run {{ scheduledSync.occurrencesRun + 1 }} of {{ scheduledSync.recurrenceCount }}
+						{{ scheduledSync.recurrenceInterval|capitalize }} · occurrence {{ scheduledSync.occurrencesRun + 1 }} of {{ scheduledSync.recurrenceCount }}
 					{% else %}
 						Once
 					{% endif %}
