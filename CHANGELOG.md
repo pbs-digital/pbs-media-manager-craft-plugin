@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+- Fixes single media syncs queuing a stale-media check for every entry in the asset's show, which made it look like the whole show was resyncing. Stale-media detection now only runs after show, season, episode, and special syncs.
+- Fixes the Single Media sync form rendering the "Media Asset's Site" field twice.
+
 ## 5.0.7 - 2026-10-13
 - Adds syncing of the `description_short` and `slug` API fields on media entries.
 - Fixes `description_long` never syncing to media entries because of a misspelled `description_log` case in the MediaSync job.

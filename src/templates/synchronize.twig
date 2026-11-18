@@ -200,17 +200,6 @@
                         instructions: 'Choose which fields you would like to be updated during this sync.',
                     }) }}
 
-                    {{ forms.selectField({
-                        first: false,
-                        label: "Media Asset's Site",
-                        instructions: "Site associated with this media asset."|t('media-manager'),
-                        id: 'siteId',
-                        name: 'siteId[]',
-                        options: siteGroups,
-                        value: activeShow.siteId,
-                        required: true,
-                    }) }}
-
                     <div id="synchronize-single-button" class="btn submit" tabindex="1">{{ 'Update Media'|t('media-manager') }}</div>
 
                 {% case 'show-entries' %}

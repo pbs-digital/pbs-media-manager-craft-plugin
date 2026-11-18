@@ -444,6 +444,11 @@ class MediaSync extends BaseJob
             $this->setProgress($queue, $count++ / $totalAssets);
         }
 
+        // Stale detection works off the show's film tag, so for a single asset it would
+        // queue a re-sync of every entry in the show. Only run it for listing syncs.
+        if ($this->singleAsset) {
+            return;
+        }
 
         $today = (new DateTime())->format('Y-m-d');
         $mergedTags = implode(', ', array_merge($this->filmTags, $this->topicTags));
