@@ -34,7 +34,7 @@
 				'scheduledSyncs' => $scheduledSyncs
 			]);
 		}
-		public function actionEdit(int $scheduledSyncId = null, ScheduledSyncModel $scheduledSync = null): Response
+		public function actionEdit(int $scheduledSyncId = null, ScheduledSyncModel $scheduledSync = null, ?string $originalScheduleDate = null): Response
 		{
 			$isNew = false;
 			$title = $scheduledSync->name ?? 'Create a new scheduled sync';
@@ -63,7 +63,8 @@
 				'tabs' => $tabs,
 				'isNew' => $isNew,
 				'selectedTab' => 'scheduledSyncSettings',
-				'shows' => $shows
+				'shows' => $shows,
+				'originalScheduleDate' => $originalScheduleDate,
 			];
 
 			/** @var craft\web\Response */
