@@ -107,16 +107,21 @@
 				? (int)$recurrenceCount
 				: null;
 
-			// Start over when the date or recurrence settings change (new records start at 0)
 			$newScheduleTimestamp = $scheduledSync->scheduleDate ? $scheduledSync->scheduleDate->getTimestamp() : null;
+
 			if ($isNewSync
 				|| $previousScheduleTimestamp !== $newScheduleTimestamp
 				|| $previousInterval !== $scheduledSync->recurrenceInterval
-				|| (int)$previousCount !== (int)$scheduledSync->recurrenceCount
 			) {
+				// New series: start over, anchored on the (new) schedule date
 				$scheduledSync->occurrencesRun = 0;
+				$scheduledSync->recurrenceStartDate = $scheduledSync->scheduleDate;
 				$scheduledSync->processed = 0;
+			} elseif ($scheduledSync->isRecurring() && (int)$previousCount !== (int)$scheduledSync->recurrenceCount) {
+				// Count-only change: keep progress, re-evaluate completion
+				$scheduledSync->processed = (int)$scheduledSync->occurrencesRun >= (int)$scheduledSync->recurrenceCount ? 1 : 0;
 			}
+
 			$scheduledSync->showId = $request->getBodyParam('showId');
 
 			$mediaFieldsToSync = $request->getBodyParam('mediaFieldsToSync');

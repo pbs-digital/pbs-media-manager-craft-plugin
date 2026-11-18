@@ -152,6 +152,7 @@ class Install extends Migration
                     'recurrenceInterval'  => $this->string()->notNull()->defaultValue( 'none' ),
                     'recurrenceCount'     => $this->integer()->null(),
                     'occurrencesRun'      => $this->integer()->notNull()->defaultValue( 0 ),
+                    'recurrenceStartDate' => $this->dateTime()->null(),
                     'dateCreated'         => $this->dateTime()->notNull(),
                     'dateUpdated'         => $this->dateTime()->notNull(),
                     'uid'                 => $this->uid(),

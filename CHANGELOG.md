@@ -1,7 +1,8 @@
 # Changelog
 
 ## Unreleased
-- Adds recurring scheduled syncs. A scheduled sync can now repeat daily, weekly, or monthly for a set number of occurrences (e.g. eight Mondays in a row). Occurrences missed while the site was down are skipped rather than fired in a burst.
+- Adds recurring scheduled syncs. A scheduled sync can now repeat daily, weekly, or monthly for a set number of occurrences (e.g. eight Mondays in a row). Runs missed while the site is offline are skipped, not fired in a burst, and still count toward the total so the series ends on its calendar end date. Monthly series keep their day of month, clamped to the month's last day.
+- Fixes saving an existing scheduled sync re-arming it: editing an already-processed sync no longer resets it to unprocessed. Changing its date or repeat interval still restarts it.
 - Fixes the `mediamanager/schedule` console command crashing with a TypeError because it queued syncs without their scheduled sync ID. It now uses the same code path as the web request check.
 
 ## 5.0.7 - 2026-10-13

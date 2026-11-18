@@ -39,6 +39,10 @@ class m261118_000000_add_recurrence_to_scheduled_sync extends Migration
             $this->addColumn($this->scheduledSyncTable, 'occurrencesRun', $this->integer()->notNull()->defaultValue(0));
         }
 
+        if (!$tableSchema->getColumn('recurrenceStartDate')) {
+            $this->addColumn($this->scheduledSyncTable, 'recurrenceStartDate', $this->dateTime()->null());
+        }
+
         Craft::$app->db->schema->refresh();
 
         echo "Finished!\n";

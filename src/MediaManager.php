@@ -23,7 +23,6 @@ use craft\events\PluginEvent;
 use Monolog\Formatter\LineFormatter;
 use craft\events\RegisterUrlRulesEvent;
 
-use pbsdigital\mediamanager\jobs\ShowSync;
 use craft\web\twig\variables\CraftVariable;
 use pbsdigital\mediamanager\helpers\SetupHelper;
 use pbsdigital\mediamanager\models\SettingsModel;

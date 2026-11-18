@@ -85,9 +85,14 @@ class ScheduledSyncModel extends BaseModel
 	public $recurrenceCount;
 
 	/**
-	 * @var int Number of times this sync has run so far
+	 * @var int Number of occurrence slots consumed so far (run or skipped)
 	 */
 	public $occurrencesRun = 0;
+
+	/**
+	 * @var DateTime|null Anchor date of the series (occurrence 0)
+	 */
+	public $recurrenceStartDate;
 
 	public function __toString()
 	{
@@ -112,6 +117,7 @@ class ScheduledSyncModel extends BaseModel
 	{
 		$datetimeAttributes =  parent::datetimeAttributes();
 		$datetimeAttributes[] = 'scheduleDate';
+		$datetimeAttributes[] = 'recurrenceStartDate';
 
 		return $datetimeAttributes;
 	}
@@ -143,20 +149,39 @@ class ScheduledSyncModel extends BaseModel
 	 */
 	public function getNextScheduleDate(): ?DateTime
 	{
-		$modifier = match ($this->recurrenceInterval) {
-			self::RECURRENCE_DAILY => '+1 day',
-			self::RECURRENCE_WEEKLY => '+1 week',
-			self::RECURRENCE_MONTHLY => '+1 month',
-			default => null,
-		};
+		return $this->isRecurring() ? $this->getOccurrenceDate((int)$this->occurrencesRun + 1) : null;
+	}
 
-		$scheduleDate = DateTimeHelper::toDateTime($this->scheduleDate);
+	/**
+	 * Returns the date of occurrence $k: the anchor date plus $k intervals.
+	 * Monthly dates are clamped to the last day of the target month
+	 * (Jan 31 → Feb 28/29 → Mar 31).
+	 */
+	public function getOccurrenceDate(int $k): ?DateTime
+	{
+		$start = DateTimeHelper::toDateTime($this->recurrenceStartDate ?: $this->scheduleDate);
 
-		if ($modifier === null || !$scheduleDate) {
+		if (!$start) {
 			return null;
 		}
 
-		return DateTime::createFromInterface($scheduleDate)->modify($modifier);
+		$date = DateTime::createFromInterface($start);
+
+		switch ($this->recurrenceInterval) {
+			case self::RECURRENCE_DAILY:
+				return $date->modify('+' . $k . ' days');
+			case self::RECURRENCE_WEEKLY:
+				return $date->modify('+' . ($k * 7) . ' days');
+			case self::RECURRENCE_MONTHLY:
+				$day = (int)$date->format('j');
+				$monthIndex = (int)$date->format('n') - 1 + $k;
+				$year = (int)$date->format('Y') + intdiv($monthIndex, 12);
+				$month = $monthIndex % 12 + 1;
+				$lastDay = (int)(new DateTime(sprintf('%04d-%02d-01', $year, $month)))->format('t');
+				return $date->setDate($year, $month, min($day, $lastDay));
+			default:
+				return null;
+		}
 	}
 
 	/**
