@@ -347,6 +347,142 @@ class SynchronizeHelper
         return self::getApiRuleByApiHandle( $apiFieldHandle, $settingName );
     }
 
+    public const PLAYER_PARAM_KEYS = ['muted', 'autoplay', 'topbar', 'endscreen'];
+
+    /**
+     * Whitelist keys and values of player params ('true'/'false' only). Accepts an array or JSON string.
+     */
+    public static function sanitizePlayerParams( mixed $params ): array
+    {
+        if( is_string( $params ) ) {
+            $params = json_decode( $params, true );
+        }
+
+        if( !is_array( $params ) ) {
+            return [];
+        }
+
+        $clean = [];
+
+        foreach( self::PLAYER_PARAM_KEYS as $key ) {
+            if( isset( $params[ $key ] ) && is_string( $params[ $key ] ) && in_array( $params[ $key ], [ 'true', 'false' ], true ) ) {
+                $clean[ $key ] = $params[ $key ];
+            }
+        }
+
+        return $clean;
+    }
+
+    /**
+     * Apply player URL params to the iframe src in $playerCode.
+     * Precedence: API value < existing entry value (keys not overridden) < explicit overrides.
+     */
+    public static function applyPlayerParams( string $playerCode, array $params, ?string $existingPlayerCode = null ): string
+    {
+        $overrides = self::sanitizePlayerParams( $params );
+        $srcPattern = '/(<iframe\b(?:[^>]*?\s)?src\s*=\s*)(["\'])(.*?)\2/is';
+
+        if( !preg_match( $srcPattern, $playerCode, $match, PREG_OFFSET_CAPTURE ) ) {
+            return $playerCode;
+        }
+
+        $rawSrc = $match[3][0];
+        $srcOffset = $match[3][1];
+
+        $existing = [];
+        if( $existingPlayerCode !== null && preg_match( $srcPattern, $existingPlayerCode, $existingMatch ) ) {
+            $existing = self::parsePlayerSrc( $existingMatch[3] )['values'];
+        }
+
+        $parsed = self::parsePlayerSrc( $rawSrc );
+        $pairs = $parsed['pairs'];
+        $changed = false;
+
+        foreach( self::PLAYER_PARAM_KEYS as $key ) {
+            if( isset( $overrides[ $key ] ) ) {
+                $value = $overrides[ $key ];
+            } elseif( array_key_exists( $key, $existing ) ) {
+                $value = $existing[ $key ];
+            } else {
+                continue;
+            }
+
+            $found = false;
+            foreach( $pairs as $i => $pair ) {
+                if( rawurldecode( $pair[0] ) !== $key ) {
+                    continue;
+                }
+
+                if( $found ) {
+                    // drop duplicate occurrences
+                    unset( $pairs[ $i ] );
+                    $changed = true;
+                    continue;
+                }
+
+                $found = true;
+                if( $pair[1] !== $value ) {
+                    $pairs[ $i ] = [ $pair[0], $value ];
+                    $changed = true;
+                }
+            }
+
+            if( !$found ) {
+                $pairs[] = [ $key, $value ];
+                $changed = true;
+            }
+        }
+
+        if( !$changed ) {
+            return $playerCode;
+        }
+
+        $glue = $parsed['encoded'] ? '&amp;' : '&';
+        $query = implode( $glue, array_map( fn( $p ) => $p[0] . '=' . $p[1], $pairs ) );
+        $newSrc = $parsed['base'] . ( $query !== '' ? '?' . $query : '' ) . $parsed['fragment'];
+
+        return substr( $playerCode, 0, $srcOffset ) . $newSrc . substr( $playerCode, $srcOffset + strlen( $rawSrc ) );
+    }
+
+    /**
+     * Split a raw src attribute value into base, query pairs (raw, order preserved) and fragment.
+     * 'values' maps whitelisted keys to their last value.
+     */
+    private static function parsePlayerSrc( string $rawSrc ): array
+    {
+        $encoded = str_contains( $rawSrc, '&amp;' );
+        $src = $encoded ? str_replace( '&amp;', '&', $rawSrc ) : $rawSrc;
+
+        $fragment = '';
+        if( ( $hashPos = strpos( $src, '#' ) ) !== false ) {
+            $fragment = substr( $src, $hashPos );
+            $src = substr( $src, 0, $hashPos );
+        }
+
+        $query = '';
+        $base = $src;
+        if( ( $qPos = strpos( $src, '?' ) ) !== false ) {
+            $base = substr( $src, 0, $qPos );
+            $query = substr( $src, $qPos + 1 );
+        }
+
+        $pairs = [];
+        $values = [];
+        foreach( $query === '' ? [] : explode( '&', $query ) as $part ) {
+            if( $part === '' ) {
+                continue;
+            }
+            $kv = explode( '=', $part, 2 );
+            $pairs[] = [ $kv[0], $kv[1] ?? '' ];
+            $name = rawurldecode( $kv[0] );
+            if( in_array( $name, self::PLAYER_PARAM_KEYS, true ) ) {
+                $values[ $name ] = $kv[1] ?? '';
+            }
+        }
+
+        return [ 'encoded' => $encoded, 'base' => $base, 'pairs' => $pairs, 'values' => $values, 'fragment' => $fragment ];
+    }
+
     public static function getSeasonField()
     {
         return self::getCraftFieldHandleByApiHandle( 'season' );

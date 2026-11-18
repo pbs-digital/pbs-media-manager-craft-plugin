@@ -64,6 +64,11 @@ class MediaSync extends BaseJob
      */
     public string|array $fieldsToSync = '*';
 
+    /**
+     * Player URL params (muted, autoplay, topbar, endscreen) => 'true'|'false'. Omitted keys keep existing values.
+     */
+    public array $playerParams = [];
+
     public array $siteTags = [];
     public array $filmTags = [];
     public array $topicTags = [];
@@ -388,6 +393,20 @@ class MediaSync extends BaseJob
 
                         $defaultFields[SynchronizeHelper::getApiField($apiField)] = $episodeId;
 
+                        break;
+
+                    case 'player_code':
+                        $playerCodeHandle = SynchronizeHelper::getApiField($apiField);
+                        $existingPlayerCode = null;
+                        if ($existingEntry && $playerCodeHandle) {
+                            $existingValue = $existingEntry->getFieldValue($playerCodeHandle);
+                            $existingPlayerCode = is_string($existingValue) ? $existingValue : null;
+                        }
+                        $defaultFields[$playerCodeHandle] = SynchronizeHelper::applyPlayerParams(
+                            (string)($assetAttributes->player_code ?? ''),
+                            $this->playerParams,
+                            $existingPlayerCode
+                        );
                         break;
 
                     default:

@@ -23,6 +23,7 @@ use yii\web\Response;
 use yii\web\ServerErrorHttpException;
 
 use pbsdigital\mediamanager\MediaManager;
+use pbsdigital\mediamanager\helpers\SynchronizeHelper;
 
 class SynchronizeController extends Controller
 {
@@ -121,6 +122,7 @@ class SynchronizeController extends Controller
         $siteId  = $request->getBodyParam( 'siteId' );
         $forceRegenerateThumbnail  = $request->getBodyParam( 'forceRegenerateThumbnail' );
 				$fieldsToSync = $request->getBodyParam('fieldsToSync');
+				$playerParams = SynchronizeHelper::sanitizePlayerParams( $request->getBodyParam( 'playerParams' ) );
 
         if( !$showId ) {
 
@@ -144,7 +146,7 @@ class SynchronizeController extends Controller
             ]);
         }
 
-        $synchronize = MediaManager::getInstance()->api->synchronizeShow( $show, $forceRegenerateThumbnail, $fieldsToSync );
+        $synchronize = MediaManager::getInstance()->api->synchronizeShow( $show, $forceRegenerateThumbnail, $fieldsToSync, $playerParams );
 
         return $this->asJson([
             'success' => true
@@ -159,6 +161,7 @@ class SynchronizeController extends Controller
         $siteId  = $request->getBodyParam( 'siteId' );
         $forceRegenerateThumbnail = $request->getBodyParam( 'forceRegenerateThumbnail' );
 				$fieldsToSync = $request->getBodyParam('fieldsToSync');
+				$playerParams = SynchronizeHelper::sanitizePlayerParams( $request->getBodyParam( 'playerParams' ) );
 
         if( !$apiKey || !$siteId ) {
 
@@ -180,7 +183,7 @@ class SynchronizeController extends Controller
             }
         }
 
-        $synchronize = MediaManager::getInstance()->api->synchronizeSingle( $apiKey, $siteId, $forceRegenerateThumbnail, $fieldsToSync );
+        $synchronize = MediaManager::getInstance()->api->synchronizeSingle( $apiKey, $siteId, $forceRegenerateThumbnail, $fieldsToSync, $playerParams );
 
         return $this->asJson([
             'success' => true
@@ -194,6 +197,7 @@ class SynchronizeController extends Controller
         $request = Craft::$app->getRequest();
 	      $forceRegenerateThumbnail = $request->getBodyParam( 'forceRegenerateThumbnail' );
 				$fieldsToSync = $request->getBodyParam('fieldsToSync');
+				$playerParams = SynchronizeHelper::sanitizePlayerParams( $request->getBodyParam( 'playerParams' ) );
 
         foreach( $shows as $show ) {
 
@@ -212,7 +216,7 @@ class SynchronizeController extends Controller
             ]);
         }
 
-        $synchronize = MediaManager::getInstance()->api->synchronizeAll( $validatedShows, $forceRegenerateThumbnail, $fieldsToSync );
+        $synchronize = MediaManager::getInstance()->api->synchronizeAll( $validatedShows, $forceRegenerateThumbnail, $fieldsToSync, $playerParams );
 
         return $this->asJson([
             'success' => true
