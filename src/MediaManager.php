@@ -62,7 +62,7 @@ class MediaManager extends Plugin
     public bool $hasCpSettings = true;
     public bool $hasCpSection = true;
 
-    public string $schemaVersion = '1.0.1';
+    public string $schemaVersion = '1.0.2';
     // Public Methods
     // =========================================================================
 
@@ -267,19 +267,7 @@ class MediaManager extends Plugin
             Application::class,
             Application::EVENT_INIT,
             function(Event $event) {
-                $scheduledSyncService = MediaManager::$plugin->scheduledSync;
-                $pushableSyncs = $scheduledSyncService->getPushableSyncs();
-
-                foreach ($pushableSyncs as $pushableSync) {
-                    Craft::$app->getQueue()->push(new ShowSync([
-                        'showId' => $pushableSync->showId,
-                        'regenerateThumbnails' => $pushableSync->regenerateThumbnail,
-                        'scheduledSync' => $pushableSync->id
-                    ]));
-
-                    $pushableSync->processed = 1;
-                    $scheduledSyncService->saveScheduledSync($pushableSync);
-                }
+                MediaManager::$plugin->scheduledSync->pushDueSyncs();
             }
         );
     }

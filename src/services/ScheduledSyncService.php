@@ -13,6 +13,7 @@
 	use craft\base\Component;
 	use craft\helpers\DateTimeHelper;
 	use craft\helpers\StringHelper;
+	use pbsdigital\mediamanager\jobs\ShowSync;
 	use pbsdigital\mediamanager\events\ScheduledSyncModelEvent;
 	use pbsdigital\mediamanager\models\ScheduledSyncModel;
 	use pbsdigital\mediamanager\records\ScheduledSyncRecord;
@@ -64,6 +65,48 @@
 			}
 
 			return ScheduledSyncModel::populateModels($filteredScheduledSyncRecords, false);
+		}
+
+		/**
+		 * Pushes every due scheduled sync to the queue and advances or completes it.
+		 *
+		 * Recurring syncs move to their next future occurrence. Occurrences missed
+		 * while the site was down are skipped (not fired in a burst, not counted as run).
+		 *
+		 * @return int Number of syncs pushed
+		 */
+		public function pushDueSyncs(): int
+		{
+			$pushed = 0;
+
+			foreach ($this->getPushableSyncs() as $pushableSync) {
+				Craft::$app->getQueue()->push(new ShowSync([
+					'showId' => $pushableSync->showId,
+					'regenerateThumbnails' => $pushableSync->regenerateThumbnail,
+					'scheduledSync' => $pushableSync->id,
+				]));
+
+				$pushableSync->occurrencesRun = (int)$pushableSync->occurrencesRun + 1;
+
+				if ($pushableSync->isRecurring() && $pushableSync->occurrencesRun < (int)$pushableSync->recurrenceCount) {
+					$next = $pushableSync->getNextScheduleDate();
+
+					while ($next && DateTimeHelper::isInThePast($next)) {
+						$pushableSync->scheduleDate = $next;
+						$next = $pushableSync->getNextScheduleDate();
+					}
+
+					$pushableSync->scheduleDate = $next;
+					$pushableSync->processed = 0;
+				} else {
+					$pushableSync->processed = 1;
+				}
+
+				$this->saveScheduledSync($pushableSync);
+				$pushed++;
+			}
+
+			return $pushed;
 		}
 
 		/**

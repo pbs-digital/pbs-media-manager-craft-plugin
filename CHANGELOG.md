@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+- Adds recurring scheduled syncs. A scheduled sync can now repeat daily, weekly, or monthly for a set number of occurrences (e.g. eight Mondays in a row). Occurrences missed while the site was down are skipped rather than fired in a burst.
+- Fixes the `mediamanager/schedule` console command crashing with a TypeError because it queued syncs without their scheduled sync ID. It now uses the same code path as the web request check.
+
 ## 5.0.7 - 2026-10-13
 - Adds syncing of the `description_short` and `slug` API fields on media entries.
 - Fixes `description_long` never syncing to media entries because of a misspelled `description_log` case in the MediaSync job.

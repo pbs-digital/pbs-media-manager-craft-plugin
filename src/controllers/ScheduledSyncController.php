@@ -90,12 +90,33 @@
 				$scheduledSync = new ScheduledSyncModel();
 			}
 
+			$isNewSync = !$scheduledSync->id;
+			$previousScheduleTimestamp = $isNewSync ? null : DateTimeHelper::toDateTime($scheduledSync->scheduleDate)?->getTimestamp();
+			$previousInterval = $scheduledSync->recurrenceInterval;
+			$previousCount = $scheduledSync->recurrenceCount;
+
 			$scheduledSync->name = $request->getBodyParam('name');
 			$scheduledSync->description = $request->getBodyParam('description');
 			$scheduledSync->scheduleDate = $request->getBodyParam('scheduleDate');
-			$scheduledSync->processed = $request->getBodyParam('processed') ?? false;
 
 			$scheduledSync->scheduleDate = DateTimeHelper::toDateTime($scheduledSync->scheduleDate);
+
+			$scheduledSync->recurrenceInterval = $request->getBodyParam('recurrenceInterval') ?: ScheduledSyncModel::RECURRENCE_NONE;
+			$recurrenceCount = $request->getBodyParam('recurrenceCount');
+			$scheduledSync->recurrenceCount = ($scheduledSync->isRecurring() && $recurrenceCount !== null && $recurrenceCount !== '')
+				? (int)$recurrenceCount
+				: null;
+
+			// Start over when the date or recurrence settings change (new records start at 0)
+			$newScheduleTimestamp = $scheduledSync->scheduleDate ? $scheduledSync->scheduleDate->getTimestamp() : null;
+			if ($isNewSync
+				|| $previousScheduleTimestamp !== $newScheduleTimestamp
+				|| $previousInterval !== $scheduledSync->recurrenceInterval
+				|| (int)$previousCount !== (int)$scheduledSync->recurrenceCount
+			) {
+				$scheduledSync->occurrencesRun = 0;
+				$scheduledSync->processed = 0;
+			}
 			$scheduledSync->showId = $request->getBodyParam('showId');
 
 			$mediaFieldsToSync = $request->getBodyParam('mediaFieldsToSync');
