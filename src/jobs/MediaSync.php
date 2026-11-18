@@ -400,7 +400,7 @@ class MediaSync extends BaseJob
                         $existingPlayerCode = null;
                         if ($existingEntry && $playerCodeHandle) {
                             $existingValue = $existingEntry->getFieldValue($playerCodeHandle);
-                            $existingPlayerCode = is_string($existingValue) ? $existingValue : null;
+                            $existingPlayerCode = ($existingValue instanceof \Stringable || is_string($existingValue)) ? (string)$existingValue : null;
                         }
                         $defaultFields[$playerCodeHandle] = SynchronizeHelper::applyPlayerParams(
                             (string)($assetAttributes->player_code ?? ''),

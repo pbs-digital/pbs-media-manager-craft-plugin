@@ -391,10 +391,15 @@ class SynchronizeHelper
 
         $existing = [];
         if( $existingPlayerCode !== null && preg_match( $srcPattern, $existingPlayerCode, $existingMatch ) ) {
-            $existing = self::parsePlayerSrc( $existingMatch[3] )['values'];
+            $existing = ( self::parsePlayerSrc( $existingMatch[3] )['values'] ?? [] );
         }
 
         $parsed = self::parsePlayerSrc( $rawSrc );
+
+        if( $parsed === null ) {
+            return $playerCode;
+        }
+
         $pairs = $parsed['pairs'];
         $changed = false;
 
@@ -446,12 +451,18 @@ class SynchronizeHelper
 
     /**
      * Split a raw src attribute value into base, query pairs (raw, order preserved) and fragment.
-     * 'values' maps whitelisted keys to their last value.
+     * 'values' maps whitelisted keys to their last 'true'/'false' value (lowercased). Returns null if the src can't be parsed safely.
      */
-    private static function parsePlayerSrc( string $rawSrc ): array
+    private static function parsePlayerSrc( string $rawSrc ): ?array
     {
-        $encoded = str_contains( $rawSrc, '&amp;' );
-        $src = $encoded ? str_replace( '&amp;', '&', $rawSrc ) : $rawSrc;
+        // Decode every spelling of an ampersand entity (&amp; &#38; &#x26;)
+        $src = preg_replace( '/&(?:amp|#0*38|#x0*26);/i', '&', $rawSrc, -1, $entityCount );
+        $encoded = $entityCount > 0;
+
+        // Any other numeric entity could hide a delimiter: bail out
+        if( $src === null || preg_match( '/&#/', $src ) ) {
+            return null;
+        }
 
         $fragment = '';
         if( ( $hashPos = strpos( $src, '#' ) ) !== false ) {
@@ -475,8 +486,9 @@ class SynchronizeHelper
             $kv = explode( '=', $part, 2 );
             $pairs[] = [ $kv[0], $kv[1] ?? '' ];
             $name = rawurldecode( $kv[0] );
-            if( in_array( $name, self::PLAYER_PARAM_KEYS, true ) ) {
-                $values[ $name ] = $kv[1] ?? '';
+            // Only 'true'/'false' are ever carried over; anything else is ignored
+            if( in_array( $name, self::PLAYER_PARAM_KEYS, true ) && isset( $kv[1] ) && in_array( strtolower( $kv[1] ), [ 'true', 'false' ], true ) ) {
+                $values[ $name ] = strtolower( $kv[1] );
             }
         }
 
