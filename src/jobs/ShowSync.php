@@ -41,8 +41,20 @@
 
 		public function execute( $queue ): void
 		{
+			$scheduledSync = $this->scheduledSync ? MediaManager::getInstance()->scheduledSync->getScheduledSyncById((int)$this->scheduledSync) : null;
+
+			if (!$scheduledSync) {
+				Craft::warning("Scheduled sync {$this->scheduledSync} no longer exists; skipping show sync.", __METHOD__);
+				return;
+			}
+
 			$show = $this->_getShow();
-			$scheduledSync = MediaManager::getInstance()->scheduledSync->getScheduledSyncById($this->scheduledSync);
+
+			if (empty($show->apiKey)) {
+				Craft::warning("Show {$this->showId} no longer exists or has no API key; skipping scheduled sync {$this->scheduledSync}.", __METHOD__);
+				return;
+			}
+
 			$mediaFieldsToSync = $scheduledSync->getMediaFieldsToSync();
 			$showFieldsToSync = $scheduledSync->getShowFieldsToSync();
 
@@ -56,7 +68,8 @@
 		protected function defaultDescription(): string
 		{
 			$show = $this->_getShow();
-			return Craft::t( 'mediamanager', "Queuing sync for {$show->name}" );
+			$name = $show->name ?? '';
+			return Craft::t( 'mediamanager', "Queuing sync for {$name}" );
 		}
 
 		private function _getShow()

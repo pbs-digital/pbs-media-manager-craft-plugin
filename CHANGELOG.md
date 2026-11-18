@@ -2,6 +2,7 @@
 
 ## Unreleased
 - Adds PBS partner-player URL parameter options (`muted`, `autoplay`, `topbar`, `endscreen`) to the single-media, show, and all-shows syncs. Each is a select of "Keep existing" (default), `true`, or `false`; it's applied to the embed URL in the `player_code` field and only when Player Code is being synced (newly created entries always get the chosen values). "Keep existing" preserves the value already saved on the entry.
+- Fixes scheduled show syncs failing in the queue when their schedule or show was deleted before the job ran. They're now skipped with a warning.
 - Adds the same player URL parameter options to scheduled syncs. They're saved with the schedule and applied to the show's media sync each time it runs.
 - Adds recurring scheduled syncs. A scheduled sync can now repeat daily, weekly, or monthly for a set number of occurrences (e.g. eight Mondays in a row). Runs missed while the site is offline are skipped, not fired in a burst, and still count toward the total so the series ends on its calendar end date. Monthly series keep their day of month, clamped to the month's last day.
 - Fixes saving an existing scheduled sync re-arming it: editing an already-processed sync no longer resets it to unprocessed. Changing its date or repeat interval still restarts it.
