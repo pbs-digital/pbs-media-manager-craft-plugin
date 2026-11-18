@@ -14,6 +14,7 @@
 	use craft\web\Controller;
 
 	use craft\web\Response;
+	use pbsdigital\mediamanager\helpers\SynchronizeHelper;
 	use pbsdigital\mediamanager\MediaManager;
 	use pbsdigital\mediamanager\models\ScheduledSyncModel;
 	use yii\web\BadRequestHttpException;
@@ -153,6 +154,9 @@
             if ($showFieldsToSync && $showFieldsToSync !== "") {
                 $scheduledSync->showFieldsToSync = $showFieldsToSync === '*' ? '*' : join(',', $showFieldsToSync);
             }
+
+			$playerParams = SynchronizeHelper::sanitizePlayerParams($request->getBodyParam('playerParams'));
+			$scheduledSync->playerParams = $playerParams ? json_encode($playerParams) : null;
 
 			$scheduledSync->regenerateThumbnail = $request->getBodyParam('forceRegenerateThumbnail') ?? false;
 

@@ -46,7 +46,7 @@
 			$mediaFieldsToSync = $scheduledSync->getMediaFieldsToSync();
 			$showFieldsToSync = $scheduledSync->getShowFieldsToSync();
 
-			MediaManager::$plugin->api->synchronizeShow($show, $this->regenerateThumbnails, $mediaFieldsToSync);
+			MediaManager::$plugin->api->synchronizeShow($show, $this->regenerateThumbnails, $mediaFieldsToSync, $scheduledSync->getPlayerParams());
 			MediaManager::$plugin->api->synchronizeShowEntries([$show], $showFieldsToSync);
 		}
 

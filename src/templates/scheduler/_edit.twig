@@ -177,6 +177,8 @@
         instructions: 'Choose which media entry fields you would like to be updated during this sync.',
     }) }}
 
+		{% include 'mediamanager/_includes/playerparams' with { playerParams: scheduledSync.getPlayerParams() } only %}
+
 		{% set fieldsToSyncMap = {} %}
 
     {% set apiColumnFields = craft.app.getPlugins().getPlugin( 'mediamanager' ).getSettings().showApiColumnFields %}

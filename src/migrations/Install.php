@@ -153,6 +153,7 @@ class Install extends Migration
                     'recurrenceCount'     => $this->integer()->null(),
                     'occurrencesRun'      => $this->integer()->notNull()->defaultValue( 0 ),
                     'recurrenceStartDate' => $this->dateTime()->null(),
+                    'playerParams'        => $this->text()->null(),
                     'dateCreated'         => $this->dateTime()->notNull(),
                     'dateUpdated'         => $this->dateTime()->notNull(),
                     'uid'                 => $this->uid(),

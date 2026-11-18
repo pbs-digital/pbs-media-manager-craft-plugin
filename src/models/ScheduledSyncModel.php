@@ -7,6 +7,7 @@ use craft\helpers\DateTimeHelper;
 use craft\helpers\UrlHelper;
 use craft\validators\DateTimeValidator;
 use DateTime;
+use pbsdigital\mediamanager\helpers\SynchronizeHelper;
 use pbsdigital\mediamanager\models\BaseModel;
 
 class ScheduledSyncModel extends BaseModel
@@ -94,6 +95,11 @@ class ScheduledSyncModel extends BaseModel
 	 */
 	public $recurrenceStartDate;
 
+	/**
+	 * @var string|null JSON-encoded player URL params (muted, autoplay, topbar, endscreen)
+	 */
+	public $playerParams;
+
 	public function __toString()
 	{
 		return $this->name;
@@ -137,6 +143,14 @@ class ScheduledSyncModel extends BaseModel
 	public function getShowFieldsToSync()
 	{
 		return $this->showFieldsToSync === '*' ? '*' : explode(',', $this->showFieldsToSync);
+	}
+
+	/**
+	 * Returns the saved player URL params as a sanitized array.
+	 */
+	public function getPlayerParams(): array
+	{
+		return SynchronizeHelper::sanitizePlayerParams($this->playerParams);
 	}
 
 	public function isRecurring(): bool
