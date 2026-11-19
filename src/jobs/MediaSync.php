@@ -64,6 +64,11 @@ class MediaSync extends BaseJob
      */
     public string|array $fieldsToSync = '*';
 
+    /**
+     * Player URL params (muted, autoplay, topbar, endscreen) => 'true'|'false'. Omitted keys keep existing values.
+     */
+    public array $playerParams = [];
+
     public array $siteTags = [];
     public array $filmTags = [];
     public array $topicTags = [];
@@ -390,6 +395,20 @@ class MediaSync extends BaseJob
 
                         break;
 
+                    case 'player_code':
+                        $playerCodeHandle = SynchronizeHelper::getApiField($apiField);
+                        $existingPlayerCode = null;
+                        if ($existingEntry && $playerCodeHandle) {
+                            $existingValue = $existingEntry->getFieldValue($playerCodeHandle);
+                            $existingPlayerCode = ($existingValue instanceof \Stringable || is_string($existingValue)) ? (string)$existingValue : null;
+                        }
+                        $defaultFields[$playerCodeHandle] = SynchronizeHelper::applyPlayerParams(
+                            (string)($assetAttributes->player_code ?? ''),
+                            $this->playerParams,
+                            $existingPlayerCode
+                        );
+                        break;
+
                     default:
                         $defaultFields[SynchronizeHelper::getApiField($apiField)] = $assetAttributes->{$apiField};
                         break;
@@ -444,6 +463,11 @@ class MediaSync extends BaseJob
             $this->setProgress($queue, $count++ / $totalAssets);
         }
 
+        // Stale detection works off the show's film tag, so for a single asset it would
+        // queue a re-sync of every entry in the show. Only run it for listing syncs.
+        if ($this->singleAsset) {
+            return;
+        }
 
         $today = (new DateTime())->format('Y-m-d');
         $mergedTags = implode(', ', array_merge($this->filmTags, $this->topicTags));

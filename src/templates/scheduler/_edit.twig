@@ -78,10 +78,49 @@
 			details: 'The date and time to run the sync.'|t('mediamanager'),
 		}) }}
 
-		{{  forms.hidden({
-			name: 'processed',
-			value: 0,
+		{% set originalScheduleDate = originalScheduleDate ?? (scheduledSync.id and scheduledSync.scheduleDate ? scheduledSync.scheduleDate|date('c') : '') %}
+		{{ forms.hidden({
+			name: 'originalScheduleDate',
+			value: originalScheduleDate,
 		}) }}
+
+		{{ forms.selectField({
+			id: 'recurrenceInterval',
+			name: 'recurrenceInterval',
+			label: 'Repeat'|t('mediamanager'),
+			value: scheduledSync.recurrenceInterval ?? 'none',
+			errors: scheduledSync.getErrors('recurrenceInterval'),
+			options: [
+				{ label: 'Does not repeat'|t('mediamanager'), value: 'none' },
+				{ label: 'Daily'|t('mediamanager'), value: 'daily' },
+				{ label: 'Weekly'|t('mediamanager'), value: 'weekly' },
+				{ label: 'Monthly'|t('mediamanager'), value: 'monthly' },
+			],
+		}) }}
+
+		<div id="recurrence-count-field"{% if (scheduledSync.recurrenceInterval ?? 'none') == 'none' %} style="display: none;"{% endif %}>
+			{{ forms.textField({
+				id: 'recurrenceCount',
+				name: 'recurrenceCount',
+				type: 'number',
+				min: 1,
+				size: 5,
+				label: 'Occurrences'|t('mediamanager'),
+				instructions: 'Total number of times this sync runs, including the first. E.g. Weekly with 8 occurrences starting on a Monday runs eight Mondays in a row.'|t('mediamanager'),
+				value: scheduledSync.recurrenceCount,
+				errors: scheduledSync.getErrors('recurrenceCount'),
+			}) }}
+		</div>
+
+		{% js %}
+			(function() {
+				var interval = document.getElementById('recurrenceInterval');
+				var field = document.getElementById('recurrence-count-field');
+				interval.addEventListener('change', function() {
+					field.style.display = interval.value === 'none' ? 'none' : '';
+				});
+			})();
+		{% endjs %}
 
 {#		{% set datetimeInput %}#}
 {#			{{ forms.date({#}
@@ -137,6 +176,8 @@
         values: scheduledSync.getMediaFieldsToSync() ?? '*',
         instructions: 'Choose which media entry fields you would like to be updated during this sync.',
     }) }}
+
+		{% include 'mediamanager/_includes/playerparams' with { playerParams: scheduledSync.getPlayerParams() } only %}
 
 		{% set fieldsToSyncMap = {} %}
 

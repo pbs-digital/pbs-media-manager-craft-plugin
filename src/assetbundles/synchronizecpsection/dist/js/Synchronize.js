@@ -69,6 +69,18 @@
           })
       },
 
+      getPlayerParams: function () {
+        var playerParams = {};
+        $('select[name^="playerParams["]').each(function () {
+          var match = $(this).attr('name').match(/^playerParams\[(\w+)\]$/);
+          var value = $(this).val();
+          if (match && value) {
+            playerParams[match[1]] = value;
+          }
+        });
+        return playerParams;
+      },
+
       synchronizeShow: function () {
         var showId = $('#showId').val()
         var name = $('#name').val()
@@ -83,6 +95,7 @@
             showId: showId,
             forceRegenerateThumbnail: forceRegenerateThumbnail,
             fieldsToSync: fieldsToSync,
+            playerParams: this.getPlayerParams(),
           };
 
           $('#synchronizeshowbtn').addClass('disabled');
@@ -141,6 +154,7 @@
             siteId: siteId,
             forceRegenerateThumbnail: forceRegenerateThumbnail,
             fieldsToSync: fieldsToSync,
+            playerParams: this.getPlayerParams(),
           };
 
           $('#synchronize-single-button').addClass('disabled');
@@ -181,6 +195,7 @@
         var data = {
           forceRegenerateThumbnail: forceRegenerateThumbnail,
           fieldsToSync: fieldsToSync,
+          playerParams: this.getPlayerParams(),
         };
 
         Craft.sendActionRequest('POST', 'mediamanager/synchronize/synchronize-all', { data: data})
