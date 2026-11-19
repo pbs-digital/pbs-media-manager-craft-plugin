@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 5.0.8 - 2026-11-19
 - Fixes single media syncs queuing a stale-media check for every entry in the asset's show, which made it look like the whole show was resyncing. Stale-media detection now only runs after show, season, episode, and special syncs.
 - Fixes the Single Media sync form rendering the "Media Asset's Site" field twice.
 - Adds PBS partner-player URL parameter options (`muted`, `autoplay`, `topbar`, `endscreen`) to the single-media, show, and all-shows syncs. Each is a select of "Keep existing" (default), `true`, or `false`; it's applied to the embed URL in the `player_code` field and only when Player Code is being synced (newly created entries always get the chosen values). "Keep existing" preserves the value already saved on the entry.
