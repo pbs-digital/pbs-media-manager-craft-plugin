@@ -111,6 +111,9 @@
                             instructions: 'Choose which fields you would like to be updated during this sync.',
                         }) }}
 
+
+                        {% include 'mediamanager/_includes/playerparams' %}
+
                         <div class="heading">
                             <label id="group-label" for="group">Synchronize All Show : {{ validatedShows }} valid show{{ validatedShows > 1 ? 's' : '' }} available to sync</label><br><br>
                         </div>
@@ -199,6 +202,9 @@
                         values: '*',
                         instructions: 'Choose which fields you would like to be updated during this sync.',
                     }) }}
+
+
+                    {% include 'mediamanager/_includes/playerparams' %}
 
                     <div id="synchronize-single-button" class="btn submit" tabindex="1">{{ 'Update Media'|t('media-manager') }}</div>
 
@@ -297,6 +303,9 @@
                                 values: '*',
                                 instructions: 'Choose which fields you would like to be updated during this sync.',
                             }) }}
+
+
+                            {% include 'mediamanager/_includes/playerparams' %}
 
                             <div class="heading">
                                 <div class="instructions"><p>By clicking button bellow will retrieve Assets from PBS API and update associated Media entries with latest data.</p></div>

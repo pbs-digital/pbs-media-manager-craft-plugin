@@ -3,6 +3,12 @@
 ## Unreleased
 - Fixes single media syncs queuing a stale-media check for every entry in the asset's show, which made it look like the whole show was resyncing. Stale-media detection now only runs after show, season, episode, and special syncs.
 - Fixes the Single Media sync form rendering the "Media Asset's Site" field twice.
+- Adds PBS partner-player URL parameter options (`muted`, `autoplay`, `topbar`, `endscreen`) to the single-media, show, and all-shows syncs. Each is a select of "Keep existing" (default), `true`, or `false`; it's applied to the embed URL in the `player_code` field and only when Player Code is being synced (newly created entries always get the chosen values). "Keep existing" preserves the value already saved on the entry.
+- Fixes scheduled show syncs failing in the queue when their schedule or show was deleted before the job ran. They're now skipped with a warning.
+- Adds the same player URL parameter options to scheduled syncs. They're saved with the schedule and applied to the show's media sync each time it runs.
+- Adds recurring scheduled syncs. A scheduled sync can now repeat daily, weekly, or monthly for a set number of occurrences (e.g. eight Mondays in a row). Runs missed while the site is offline are skipped, not fired in a burst, and still count toward the total so the series ends on its calendar end date. Monthly series keep their day of month, clamped to the month's last day.
+- Fixes saving an existing scheduled sync re-arming it: editing an already-processed sync no longer resets it to unprocessed. Changing its date or repeat interval still restarts it.
+- Fixes the `mediamanager/schedule` console command crashing with a TypeError because it queued syncs without their scheduled sync ID. It now uses the same code path as the web request check.
 
 ## 5.0.7 - 2026-10-13
 - Adds syncing of the `description_short` and `slug` API fields on media entries.

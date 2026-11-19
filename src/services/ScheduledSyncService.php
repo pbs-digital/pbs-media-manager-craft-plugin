@@ -12,7 +12,9 @@
 	use Craft;
 	use craft\base\Component;
 	use craft\helpers\DateTimeHelper;
+	use craft\helpers\Db;
 	use craft\helpers\StringHelper;
+	use pbsdigital\mediamanager\jobs\ShowSync;
 	use pbsdigital\mediamanager\events\ScheduledSyncModelEvent;
 	use pbsdigital\mediamanager\models\ScheduledSyncModel;
 	use pbsdigital\mediamanager\records\ScheduledSyncRecord;
@@ -64,6 +66,76 @@
 			}
 
 			return ScheduledSyncModel::populateModels($filteredScheduledSyncRecords, false);
+		}
+
+		/**
+		 * Pushes every due scheduled sync to the queue and advances or completes it.
+		 *
+		 * `occurrencesRun` counts occurrence slots consumed (run or skipped). After running
+		 * slot i, slots whose date has already passed (e.g. the site was down) are skipped
+		 * but still count toward `recurrenceCount`, so a series ends on its calendar end date.
+		 *
+		 * Each sync is claimed with one conditional UPDATE; the job is pushed only if this
+		 * process won the claim, so concurrent requests can't double-push.
+		 *
+		 * @return int Number of syncs pushed
+		 */
+		public function pushDueSyncs(): int
+		{
+			$pushed = 0;
+
+			foreach ($this->getPushableSyncs() as $sync) {
+				$oldRun = (int)$sync->occurrencesRun;
+				$values = [];
+
+				if ($sync->isRecurring()) {
+					$count = (int)$sync->recurrenceCount;
+					$k = $oldRun + 1;
+					$next = null;
+
+					while ($k < $count) {
+						$next = $sync->getOccurrenceDate($k);
+						if (!$next || !DateTimeHelper::isInThePast($next)) {
+							break;
+						}
+						$k++;
+					}
+
+					if ($k >= $count || !$next) {
+						$values = ['occurrencesRun' => max($count, $oldRun + 1), 'processed' => 1];
+					} else {
+						$values = [
+							'occurrencesRun' => $k,
+							'processed' => 0,
+							'scheduleDate' => Db::prepareDateForDb($next),
+						];
+					}
+				} else {
+					$values = ['occurrencesRun' => $oldRun + 1, 'processed' => 1];
+				}
+
+				$claimed = ScheduledSyncRecord::updateAll($values, [
+					'id' => $sync->id,
+					'processed' => 0,
+					'occurrencesRun' => $oldRun,
+				]);
+
+				if ($claimed !== 1) {
+					Craft::warning('Scheduled sync ' . $sync->id . ' was already claimed by another process; skipping.', __METHOD__);
+					continue;
+				}
+
+				Craft::$app->getQueue()->push(new ShowSync([
+					'showId' => $sync->showId,
+					'regenerateThumbnails' => $sync->regenerateThumbnail,
+					'scheduledSync' => $sync->id,
+				]));
+
+				Craft::info('Pushed scheduled sync ' . $sync->id . ' (occurrence ' . ($oldRun + 1) . ').', __METHOD__);
+				$pushed++;
+			}
+
+			return $pushed;
 		}
 
 		/**

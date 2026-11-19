@@ -1,0 +1,33 @@
+{# Player URL Parameters. Optional: `playerParams` (hash of saved values) #}
+{% import '_includes/forms' as forms %}
+
+{% set playerParams = playerParams ?? {} %}
+{% set playerParamOptions = [
+    { label: 'Keep existing', value: '' },
+    { label: 'true', value: 'true' },
+    { label: 'false', value: 'false' },
+] %}
+{% set playerParamFields = {
+    muted: 'Muted',
+    autoplay: 'Autoplay',
+    topbar: 'Top bar',
+    endscreen: 'End screen',
+} %}
+
+<div class="field" id="playerParams-field">
+    <div class="heading">
+        <label id="playerParams-label">{{ 'Player URL Parameters'|t('media-manager') }}</label>
+        <div class="instructions"><p>{{ "Only applied when Player Code is synced (always applied to newly created entries). 'Keep existing' leaves the value already saved on the entry."|t('media-manager') }}</p></div>
+    </div>
+    <div class="input">
+        {% for key, label in playerParamFields %}
+            {{ forms.selectField({
+                label: label,
+                id: 'playerParams-' ~ key,
+                name: 'playerParams[' ~ key ~ ']',
+                options: playerParamOptions,
+                value: playerParams[key] ?? '',
+            }) }}
+        {% endfor %}
+    </div>
+</div>

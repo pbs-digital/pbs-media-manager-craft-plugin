@@ -14,6 +14,7 @@
 	use craft\web\Controller;
 
 	use craft\web\Response;
+	use pbsdigital\mediamanager\helpers\SynchronizeHelper;
 	use pbsdigital\mediamanager\MediaManager;
 	use pbsdigital\mediamanager\models\ScheduledSyncModel;
 	use yii\web\BadRequestHttpException;
@@ -34,7 +35,7 @@
 				'scheduledSyncs' => $scheduledSyncs
 			]);
 		}
-		public function actionEdit(int $scheduledSyncId = null, ScheduledSyncModel $scheduledSync = null): Response
+		public function actionEdit(int $scheduledSyncId = null, ScheduledSyncModel $scheduledSync = null, ?string $originalScheduleDate = null): Response
 		{
 			$isNew = false;
 			$title = $scheduledSync->name ?? 'Create a new scheduled sync';
@@ -63,7 +64,8 @@
 				'tabs' => $tabs,
 				'isNew' => $isNew,
 				'selectedTab' => 'scheduledSyncSettings',
-				'shows' => $shows
+				'shows' => $shows,
+				'originalScheduleDate' => $originalScheduleDate,
 			];
 
 			/** @var craft\web\Response */
@@ -90,12 +92,56 @@
 				$scheduledSync = new ScheduledSyncModel();
 			}
 
+			$isNewSync = !$scheduledSync->id;
+			$previousScheduleDate = $isNewSync ? null : DateTimeHelper::toDateTime($scheduledSync->scheduleDate);
+
+			// The form may be stale (the series can advance after it was rendered), so compare
+			// the posted date with the date the form was rendered with, not the current DB value.
+			$originalScheduleParam = $request->getBodyParam('originalScheduleDate');
+			$originalScheduleDate = $originalScheduleParam ? DateTimeHelper::toDateTime($originalScheduleParam) : $previousScheduleDate;
+			$previousInterval = $scheduledSync->recurrenceInterval;
+			$previousCount = $scheduledSync->recurrenceCount;
+
 			$scheduledSync->name = $request->getBodyParam('name');
 			$scheduledSync->description = $request->getBodyParam('description');
 			$scheduledSync->scheduleDate = $request->getBodyParam('scheduleDate');
-			$scheduledSync->processed = $request->getBodyParam('processed') ?? false;
 
 			$scheduledSync->scheduleDate = DateTimeHelper::toDateTime($scheduledSync->scheduleDate);
+
+			$scheduledSync->recurrenceInterval = $request->getBodyParam('recurrenceInterval') ?: ScheduledSyncModel::RECURRENCE_NONE;
+			$recurrenceCount = $request->getBodyParam('recurrenceCount');
+			$scheduledSync->recurrenceCount = ($scheduledSync->isRecurring() && $recurrenceCount !== null && $recurrenceCount !== '')
+				? (int)$recurrenceCount
+				: null;
+
+			$newScheduleDate = $scheduledSync->scheduleDate;
+			$scheduleDateChanged = $isNewSync
+				|| !$originalScheduleDate
+				|| !$newScheduleDate
+				|| intdiv($newScheduleDate->getTimestamp(), 60) !== intdiv($originalScheduleDate->getTimestamp(), 60);
+
+			if (!$scheduleDateChanged) {
+				// Unchanged by the editor: keep the DB value, the series may have advanced
+				$scheduledSync->scheduleDate = $previousScheduleDate;
+			}
+
+			if ($scheduleDateChanged
+				|| $previousInterval !== $scheduledSync->recurrenceInterval
+			) {
+				// New series: start over, anchored on the (new) schedule date
+				$scheduledSync->occurrencesRun = 0;
+				$scheduledSync->recurrenceStartDate = $scheduledSync->scheduleDate;
+				$scheduledSync->processed = 0;
+			} elseif ($scheduledSync->isRecurring() && (int)$previousCount !== (int)$scheduledSync->recurrenceCount) {
+				// Count-only change: keep progress, re-evaluate completion
+				$scheduledSync->processed = (int)$scheduledSync->occurrencesRun >= (int)$scheduledSync->recurrenceCount ? 1 : 0;
+
+				if (!$scheduledSync->processed) {
+					// Re-opened series: pending row's date must be the date of its current slot
+					$scheduledSync->scheduleDate = $scheduledSync->getOccurrenceDate((int)$scheduledSync->occurrencesRun);
+				}
+			}
+
 			$scheduledSync->showId = $request->getBodyParam('showId');
 
 			$mediaFieldsToSync = $request->getBodyParam('mediaFieldsToSync');
@@ -109,12 +155,16 @@
                 $scheduledSync->showFieldsToSync = $showFieldsToSync === '*' ? '*' : join(',', $showFieldsToSync);
             }
 
+			$playerParams = SynchronizeHelper::sanitizePlayerParams($request->getBodyParam('playerParams'));
+			$scheduledSync->playerParams = $playerParams ? json_encode($playerParams) : null;
+
 			$scheduledSync->regenerateThumbnail = $request->getBodyParam('forceRegenerateThumbnail') ?? false;
 
 			if(!MediaManager::getInstance()->scheduledSync->saveScheduledSync($scheduledSync)) {
 				Craft::$app->getSession()->setError(Craft::t('mediamanager', 'Couldn’t save scheduled sync.'));
 				Craft::$app->getUrlManager()->setRouteParams([
-					'scheduledSync' => $scheduledSync
+					'scheduledSync' => $scheduledSync,
+					'originalScheduleDate' => $originalScheduleDate?->format('c'),
 				]);
 				return null;
 			}

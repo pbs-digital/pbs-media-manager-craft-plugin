@@ -28,6 +28,7 @@
 	 * @property string $mediaFieldsToSync
 	 * @property string $showFieldsToSync
 	 * @property bool $regenerateThumbnail
+	 * @property string|null $playerParams
 	 */
 	class ScheduledSyncRecord extends ActiveRecord
 	{
